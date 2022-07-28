@@ -241,13 +241,6 @@ namespace OUU::CodingStandard
 		{
 		}
 
-	public:
-		// [struct.functions] Structs may only have constructor, operator and conversion functions.
-		// If it gets any more complicated than that, you should declare them as class instead.
-
-		// Get this character's numeric awesomeness converted to a fixed-step level.
-		EAwesomenessLevel GetAwesomenessLevel() const;
-
 		// [func.comp_ops] When implementing comparison operators, use the binary free form
 		// as it provides the most flexibility with operands order and usage.
 		// If it needs to access private members, make it 'friend'.
@@ -255,9 +248,14 @@ namespace OUU::CodingStandard
 		friend bool operator==(const FNumericAwesomeness& LHS, const FNumericAwesomeness& RHS);
 		friend bool operator<(const FNumericAwesomeness& LHS, const FNumericAwesomeness& RHS);
 
-	public:
 		// Why the character is so awesome
 		FString AwesomenessReason = TEXT("");
+
+		// [struct.functions] Structs may only have constructor, operator and conversion functions.
+		// If it gets any more complicated than that, you should declare them as class instead.
+
+		// Get this character's numeric awesomeness converted to a fixed-step level.
+		EAwesomenessLevel GetAwesomenessLevel() const;
 
 	private:
 		// How awesome the character is
@@ -332,9 +330,8 @@ UCLASS()
 class OUUCODINGSTANDARD_API AOUUExampleCharacter : public ACharacter, public IOUUExampleColorableInterface
 {
 	// [order.members] Within any class/struct, members must be sorted by the following criteria in order:
-	// 1. Category (see x. items below)
-	// 2. Access Level -> see [order.access]
-	// 3. Subcategory (see x.x items below)
+	// 1. Access Level -> see [order.access]
+	// 2. Nested categories (see items below)
 	//
 	// Categories are defined as follows:
 	// 1. Generated body macros -> see [macro.genbody]
@@ -365,9 +362,8 @@ class OUUCODINGSTANDARD_API AOUUExampleCharacter : public ACharacter, public IOU
 	GENERATED_BODY()
 
 	// [order.access] Order and group members by access level: public > protected > private.
-	// Each group requires unique access declarations even if the access level is the same as the previous group.
-	// This is to prevent accidental access level changes.
-	// Always add an initial access level declaration.
+	// In total a class should therefore have max three access level specifiers.
+	// Always add an initial access level declaration after GENERATED_BODY().
 	// Do not rely on implicit access (i.e. struct = public, class = private).
 public:
 	// [alias.using] Use using declarations for aliasing instead of typedefs
@@ -379,11 +375,9 @@ public:
 	// [naming.alias.template.instance] When aliasing a template instance, use F as prefix, e.g.
 	using FCharacterMeshPtr = TWeakObjectPtr<USkeletalMeshComponent>;
 
-public:
 	DECLARE_EVENT_OneParam(AOUUExampleCharacter, FOnAwesomenessChanged, EAwesomenessLevel);
 	FOnAwesomenessChanged OnAwesomenessChanged;
 
-public:
 	// [member.constant.primitive] Primitive constants should be declared as constexpr, if possible.
 	// Prefer this any time over defines, c-style enums or static const values that are defined in cpp.
 	static CONSTEXPR int32 NumBodyParts = 2;
@@ -393,63 +387,8 @@ public:
 	static const FName HeadBodyPartName;
 	static const FName TorsoBodyPartName;
 
-private:
-	struct FNestedStruct
-	{
-		// ...
-	};
-
-public:
 	AOUUExampleCharacter();
 
-public:
-	// [member.accessor] Prefer declaring accessor functions (getters + setters) over making member field public.
-	EAwesomenessLevel GetAwesomenessLevel() const;
-	void SetAwesomeness(int32 Awesomeness);
-
-	// Checks if all possible colors are assigned to this character in any body part
-	bool HasAllColorsPossible() const;
-
-protected:
-	// [naming.func.rpc] Remote procedure calls should be prefixed with the type of RPC + '_'.
-	UFUNCTION(Server, reliable)
-	void Server_SendDataToServer();
-
-	UFUNCTION(Client, reliable)
-	void Client_SendDataToClient();
-
-	// [rpc.reliability] Functions should be marked as unreliable whenever possible. This is mostly for cosmetic events
-	// that are sent to clients.
-	UFUNCTION(NetMulticast, unreliable)
-	void Multicast_SendDataToEveryone();
-
-private:
-	UFUNCTION()
-	void HandleOwnAwesomenessChanged(EAwesomenessLevel Awesomeness);
-
-	UFUNCTION()
-	void OnRep_Score(int32 ReplicatedScore);
-
-	// [member.order.overrides] Overridden functions are grouped by the class where the function was first declared.
-	// Each group must start with a comment indicating the originating parent class.
-	// That is the parent class where the function was first declared.
-
-	// [member.virtual] Overriden virtual functions must be marked as either override or final.
-	// Do NOT use the virtual keyword.
-
-	// [doc.member.virtual] Virtual overrides should not need to be documented as the API should be consistent with
-	// the initial declaration.
-
-	// -- AActor interface
-public:
-	void BeginPlay() override;
-	void EndPlay(EEndPlayReason::Type EndPlayReason) override;
-
-	// -- IOUUExampleColorableInterface
-public:
-	bool ColorBodyPart(FName BodyPartName, EOUUExampleBodyPartColor BodyPartColor) override;
-
-public:
 	// [doc.delegate.instance] Do not duplicate parameter docs for delegate at the instance.
 	// Instad, focus on the things that changes between instances.
 
@@ -468,12 +407,53 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnExampleColorablePartColorChanged OnTorsoColorChanged;
 
+	// [member.accessor] Prefer declaring accessor functions (getters + setters) over making member field public.
+	EAwesomenessLevel GetAwesomenessLevel() const;
+	void SetAwesomeness(int32 Awesomeness);
+
+	// Checks if all possible colors are assigned to this character in any body part
+	bool HasAllColorsPossible() const;
+
+	// [member.order.overrides] Overridden functions are grouped by the class where the function was first declared.
+	// Each group must start with a comment indicating the originating parent class.
+	// That is the parent class where the function was first declared.
+
+	// [member.virtual] Overriden virtual functions must be marked as either override or final.
+	// Do NOT use the virtual keyword.
+
+	// [doc.member.virtual] Virtual overrides should not need to be documented as the API should be consistent with
+	// the initial declaration.
+
+	// -- AActor interface
+	void BeginPlay() override;
+	void EndPlay(EEndPlayReason::Type EndPlayReason) override;
+
+	// -- IOUUExampleColorableInterface
+	bool ColorBodyPart(FName BodyPartName, EOUUExampleBodyPartColor BodyPartColor) override;
+
 protected:
 	// [naming.func.onrep] Functions bound to property replication events are named 'OnRep_' + VariableWithoutPrefix.
 	UPROPERTY(ReplicatedUsing = OnRep_Score)
 	int32 Score = 0;
 
+	// [naming.func.rpc] Remote procedure calls should be prefixed with the type of RPC + '_'.
+	UFUNCTION(Server, reliable)
+	void Server_SendDataToServer();
+
+	UFUNCTION(Client, reliable)
+	void Client_SendDataToClient();
+
+	// [rpc.reliability] Functions should be marked as unreliable whenever possible. This is mostly for cosmetic events
+	// that are sent to clients.
+	UFUNCTION(NetMulticast, unreliable)
+	void Multicast_SendDataToEveryone();
+
 private:
+	struct FNestedStruct
+	{
+		// ...
+	};
+
 	// [member.init] Initialize member via assignment, unless it's a default constructible struct
 	UPROPERTY(VisibleAnywhere)
 	EOUUExampleBodyPartColor HeadColor = EOUUExampleBodyPartColor::Red;
@@ -493,6 +473,12 @@ private:
 	USkeletalMeshComponent* HeadMeshComponent = nullptr;
 
 	FDelegateHandle BoundDelegateHandle;
+
+	UFUNCTION()
+	void HandleOwnAwesomenessChanged(EAwesomenessLevel Awesomeness);
+
+	UFUNCTION()
+	void OnRep_Score(int32 ReplicatedScore);
 };
 
 //---------------------------------------------------------------------------------------------------------------------

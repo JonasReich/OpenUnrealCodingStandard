@@ -107,7 +107,8 @@ namespace OUU::CodingStandard::Private::IsolatedSamples
 	// See
 	// https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#f15-prefer-simple-and-conventional-ways-of-passing-information
 
-	// [cpp.divider.function] Above each function definition in a cpp file, place a 120 char wide line like this:
+	// [cpp.divider] These divider lines may be used in long cpp files to give some more visual structure to the file.
+	// Using them is not mandatory, but you should stay consistent - at least within a single file.
 	//---------------------------------------------------------------------------------------------------------------------
 	void Auto()
 	{
@@ -235,7 +236,7 @@ namespace OUU::CodingStandard::Private::IsolatedSamples
 } // namespace OUU::CodingStandard::Private::IsolatedSamples
 
 // [namespace.func.impl] Create namespace scopes in the cpp file instead of inlining the namespace name into the
-// function signatures, e.g. here: FString OUU::CodingStandards::LexToString(EAwesomenessLevel _AwesomenessLevel).
+// function signatures, e.g. here: FString OUU::CodingStandards::LexToString(EAwesomenessLevel AwesomenessLevel).
 namespace OUU::CodingStandard
 {
 	//---------------------------------------------------------------------------------------------------------------------
@@ -278,8 +279,7 @@ namespace OUU::CodingStandard
 } // namespace OUU::CodingStandard
 
 // [cpp.divider.class] If a cpp file contains function definitions for multiple classes, place a separator
-// in the following format above the first function definition of each class, instead of the regular separator
-// -> see [cpp.divider.function].
+// in the following format above the first function definition of each class
 //---------------------------------------------------------------------------------------------------------------------
 // AOUUExampleCharacter
 //---------------------------------------------------------------------------------------------------------------------
@@ -295,6 +295,27 @@ AOUUExampleCharacter::AOUUExampleCharacter()
 }
 
 //---------------------------------------------------------------------------------------------------------------------
+EAwesomenessLevel AOUUExampleCharacter::GetAwesomenessLevel() const
+{
+	return CharacterData.GetAwesomenessLevel();
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+void AOUUExampleCharacter::SetAwesomeness(int32 Awesomeness)
+{
+	auto AwesomenessLevelBefore = CharacterData.GetAwesomenessLevel();
+
+	CharacterData = FCharacterData(Awesomeness, TEXT("set by SetAwesomeness"));
+	auto NewAwesomenessLevel = CharacterData.GetAwesomenessLevel();
+
+	if (NewAwesomenessLevel != AwesomenessLevelBefore)
+	// [braces.one_per_line] Follow Allman style aka one line per brace
+	{
+		OnAwesomenessChanged.Broadcast(NewAwesomenessLevel);
+	}
+}
+
+//---------------------------------------------------------------------------------------------------------------------
 bool AOUUExampleCharacter::HasAllColorsPossible() const
 {
 	// [enum.range.use] If you have functions like this that need to iterate over all possible cases of an enum,
@@ -305,37 +326,6 @@ bool AOUUExampleCharacter::HasAllColorsPossible() const
 			return false;
 	}
 	return true;
-}
-
-//---------------------------------------------------------------------------------------------------------------------
-void AOUUExampleCharacter::Server_SendDataToServer_Implementation() {}
-
-//---------------------------------------------------------------------------------------------------------------------
-void AOUUExampleCharacter::Client_SendDataToClient_Implementation() {}
-
-//---------------------------------------------------------------------------------------------------------------------
-void AOUUExampleCharacter::Multicast_SendDataToEveryone_Implementation() {}
-
-//---------------------------------------------------------------------------------------------------------------------
-void AOUUExampleCharacter::OnRep_Score(int32 _ReplicatedScore) {}
-
-//---------------------------------------------------------------------------------------------------------------------
-void AOUUExampleCharacter::HandleOwnAwesomenessChanged(EAwesomenessLevel Awesomeness)
-{
-	// [braces.always] Always use braces, even for single line if-statements.
-	// only exception: early-returns -> see [earlyreturn]
-	if (Awesomeness == EAwesomenessLevel::Awesome)
-	{
-		UE_LOG(LogOUUCodingStandard, Log, TEXT("Character %s just became AWESOME!"), *GetName());
-	}
-
-	// ...for the specific case above you can use UE_CLOG as alternative:
-	UE_CLOG(
-		Awesomeness == EAwesomenessLevel::Awesome,
-		LogOUUCodingStandard,
-		Log,
-		TEXT("Character %s just became AWESOME!"),
-		*GetName());
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -414,25 +404,35 @@ bool AOUUExampleCharacter::ColorBodyPart(FName BodyPartName, EOUUExampleBodyPart
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-EAwesomenessLevel AOUUExampleCharacter::GetAwesomenessLevel() const
+void AOUUExampleCharacter::Server_SendDataToServer_Implementation() {}
+
+//---------------------------------------------------------------------------------------------------------------------
+void AOUUExampleCharacter::Client_SendDataToClient_Implementation() {}
+
+//---------------------------------------------------------------------------------------------------------------------
+void AOUUExampleCharacter::Multicast_SendDataToEveryone_Implementation() {}
+
+//---------------------------------------------------------------------------------------------------------------------
+void AOUUExampleCharacter::HandleOwnAwesomenessChanged(EAwesomenessLevel Awesomeness)
 {
-	return CharacterData.GetAwesomenessLevel();
+	// [braces.always] Always use braces, even for single line if-statements.
+	// only exception: early-returns -> see [earlyreturn]
+	if (Awesomeness == EAwesomenessLevel::Awesome)
+	{
+		UE_LOG(LogOUUCodingStandard, Log, TEXT("Character %s just became AWESOME!"), *GetName());
+	}
+
+	// ...for the specific case above you can use UE_CLOG as alternative:
+	UE_CLOG(
+		Awesomeness == EAwesomenessLevel::Awesome,
+		LogOUUCodingStandard,
+		Log,
+		TEXT("Character %s just became AWESOME!"),
+		*GetName());
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-void AOUUExampleCharacter::SetAwesomeness(int32 Awesomeness)
-{
-	auto AwesomenessLevelBefore = CharacterData.GetAwesomenessLevel();
-
-	CharacterData = FCharacterData(Awesomeness, TEXT("set by SetAwesomeness"));
-	auto NewAwesomenessLevel = CharacterData.GetAwesomenessLevel();
-
-	if (NewAwesomenessLevel != AwesomenessLevelBefore)
-	// [braces.one_per_line] Follow Allman style aka one line per brace
-	{
-		OnAwesomenessChanged.Broadcast(NewAwesomenessLevel);
-	}
-}
+void AOUUExampleCharacter::OnRep_Score(int32 ReplicatedScore) {}
 
 //---------------------------------------------------------------------------------------------------------------------
 // [func.replprops] This function is auto-declared by UHT for any AActor with replicated properties.
