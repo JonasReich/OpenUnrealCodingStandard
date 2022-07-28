@@ -4,9 +4,9 @@
 // [h.divider] These divider lines may be used in long header files, but generally their presence is a sign of breaking
 // the [basic.files] rule
 //---------------------------------------------------------------------------------------------------------------------
-// [basic.epic] Unless explicitly stated otherwise by the AUTHOR/STUDIO coding standard, follow the Epic coding standard as a
-// baseline. Especially for header files / public API.
-// See https://docs.unrealengine.com/latest/INT/Programming/Development/CodingStandard/
+// [basic.epic] Unless explicitly stated otherwise by the AUTHOR/STUDIO coding standard, follow the Epic coding standard
+// as a baseline. Especially for header files / public API. See
+// https://docs.unrealengine.com/latest/INT/Programming/Development/CodingStandard/
 
 // [basic.language] Use US English for all names and comments.
 //  BAD -> FColor SpezialisierteFarbe;
@@ -163,13 +163,14 @@ ENUM_RANGE_BY_COUNT(EOUUExampleBodyPartColor, EOUUExampleBodyPartColor::Count);
  * @param	OldBodyPartColor	Color preset that was applied before the change.
  * @param	NewBodyPartColor	Color preset that is applied now.
  */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnExampleColorablePartColorChanged,
-FName,
-BodyPartName,
-EOUUExampleBodyPartColor,
-OldBodyPartColor,
-EOUUExampleBodyPartColor,
-NewBodyPartColor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(
+	FOnExampleColorablePartColorChanged,
+	FName,
+	BodyPartName,
+	EOUUExampleBodyPartColor,
+	OldBodyPartColor,
+	EOUUExampleBodyPartColor,
+	NewBodyPartColor);
 
 // [naming.interface.uclass] Same as the corresponding IInterface class but with changed type prefix (U instead of I).
 // [doc.interface.uclass] The UInterface does not need a type comment, as it's mainly required for the reflection data.
@@ -198,7 +199,7 @@ public:
 	 * @returns		true if the body part was found and successfully colored.
 	 */
 	UFUNCTION(BlueprintCallable)
-		virtual bool ColorBodyPart(FName _BodyPartName, EOUUExampleBodyPartColor _BodyPartColor) = 0;
+	virtual bool ColorBodyPart(FName _BodyPartName, EOUUExampleBodyPartColor _BodyPartColor) = 0;
 };
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -230,7 +231,7 @@ namespace OUU::CodingStandard
 	/**
 	 * Track how awesome a character is.
 	 */
-	 // [naming.struct] Structs are prefixed with F
+	// [naming.struct] Structs are prefixed with F
 	struct FNumericAwesomeness
 	{
 	public:
@@ -238,19 +239,15 @@ namespace OUU::CodingStandard
 		FNumericAwesomeness() = default;
 
 		// [ctor.initalizer.inline] An initializing constructor may be inlined.
-		FNumericAwesomeness(int32 _Awesomeness, FString _AwesomenessReason)
-			: AwesomenessReason(_AwesomenessReason)
-			, Awesomeness(_Awesomeness)
+		FNumericAwesomeness(int32 _Awesomeness, FString _AwesomenessReason) :
+			AwesomenessReason(_AwesomenessReason), Awesomeness(_Awesomeness)
 		{
 		}
 
 		// [ctor.delegate] Delegate parameter contructors to a single one that takes all of them, unless impossible.
 		// [ctor.explicit] Single-argument constructors must be declared as explicit unless implicit conversion is
 		// specifically wanted. In that case, this conversion behavior needs to be documented.
-		explicit FNumericAwesomeness(int32 _Awesomeness)
-			: FNumericAwesomeness(_Awesomeness, TEXT("unknown reason"))
-		{
-		}
+		explicit FNumericAwesomeness(int32 _Awesomeness) : FNumericAwesomeness(_Awesomeness, TEXT("unknown reason")) {}
 
 	public:
 		// [struct.functions] Structs may only have constructor, operator and conversion functions.
@@ -340,9 +337,7 @@ UCLASS()
 // - S: Classes that inherit from SWidget
 // - I: Interface classes -> see [naming.iinterface]
 // - F: All other classes -> same as structs -> see [naming.struct]
-class OUUCODINGSTANDARD_API AOUUExampleCharacter
-	: public ACharacter
-	, public IOUUExampleColorableInterface
+class OUUCODINGSTANDARD_API AOUUExampleCharacter : public ACharacter, public IOUUExampleColorableInterface
 {
 	// [order.members] Within any class/struct, members must be sorted by the following criteria in order:
 	// 1. Category (see x. items below)
@@ -377,11 +372,11 @@ class OUUCODINGSTANDARD_API AOUUExampleCharacter
 	// GENERATED_IINTERFACE_BODY(), etc.
 	GENERATED_BODY()
 
-		// [order.access] Order and group members by access level: public > protected > private.
-		// Each group requires unique access declarations even if the access level is the same as the previous group.
-		// This is to prevent accidental access level changes.
-		// Always add an initial access level declaration.
-		// Do not rely on implicit access (i.e. struct = public, class = private).
+	// [order.access] Order and group members by access level: public > protected > private.
+	// Each group requires unique access declarations even if the access level is the same as the previous group.
+	// This is to prevent accidental access level changes.
+	// Always add an initial access level declaration.
+	// Do not rely on implicit access (i.e. struct = public, class = private).
 public:
 	// [alias.using] Use using declarations for aliasing instead of typedefs
 	// [naming.alias] Adopt the prefix of the aliased type, except for the following exceptions:
@@ -427,22 +422,22 @@ public:
 protected:
 	// [naming.func.rpc] Remote procedure calls should be prefixed with the type of RPC + '_'.
 	UFUNCTION(Server, reliable)
-		void Server_SendDataToServer();
+	void Server_SendDataToServer();
 
 	UFUNCTION(Client, reliable)
-		void Client_SendDataToClient();
+	void Client_SendDataToClient();
 
 	// [rpc.reliability] Functions should be marked as unreliable whenever possible. This is mostly for cosmetic events
 	// that are sent to clients.
 	UFUNCTION(NetMulticast, unreliable)
-		void Multicast_SendDataToEveryone();
+	void Multicast_SendDataToEveryone();
 
 private:
 	UFUNCTION()
-		void HandleOwnAwesomenessChanged(EAwesomenessLevel _Awesomeness);
+	void HandleOwnAwesomenessChanged(EAwesomenessLevel _Awesomeness);
 
 	UFUNCTION()
-		void OnRep_Score(int32 _ReplicatedScore);
+	void OnRep_Score(int32 _ReplicatedScore);
 
 	// [member.order.overrides] Overridden functions are grouped by the class where the function was first declared.
 	// Each group must start with a comment indicating the originating parent class.
@@ -472,28 +467,28 @@ public:
 
 	// [naming.delegate.instance] Delegate instances are prefixed with 'On'. The name must be an event in past tense.
 	UPROPERTY(BlueprintAssignable)
-		FOnExampleColorablePartColorChanged OnBodyPartColorChanged;
+	FOnExampleColorablePartColorChanged OnBodyPartColorChanged;
 
 	// [doc.omit] Omit doc comments that are obvious from the type/member naming.
 	// Restating the obvious just wastes space and time.
 	UPROPERTY(BlueprintAssignable)
-		FOnExampleColorablePartColorChanged OnHeadColorChanged;
+	FOnExampleColorablePartColorChanged OnHeadColorChanged;
 
 	UPROPERTY(BlueprintAssignable)
-		FOnExampleColorablePartColorChanged OnTorsoColorChanged;
+	FOnExampleColorablePartColorChanged OnTorsoColorChanged;
 
 protected:
 	// [naming.func.onrep] Functions bound to property replication events are named 'OnRep_' + VariableWithoutPrefix.
 	UPROPERTY(ReplicatedUsing = OnRep_Score)
-		int32 m_Score = 0;
+	int32 m_Score = 0;
 
 private:
 	// [member.init] Initialize member via assignment, unless it's a default constructible struct
 	UPROPERTY(VisibleAnywhere)
-		EOUUExampleBodyPartColor m_HeadColor = EOUUExampleBodyPartColor::Red;
+	EOUUExampleBodyPartColor m_HeadColor = EOUUExampleBodyPartColor::Red;
 
 	UPROPERTY(VisibleAnywhere)
-		EOUUExampleBodyPartColor m_TorsoColor = EOUUExampleBodyPartColor::Red;
+	EOUUExampleBodyPartColor m_TorsoColor = EOUUExampleBodyPartColor::Red;
 
 	// [naming.bool] Boolean variables and member fields should not be prefixed with b as in the Epic conventions.
 	// Use verb as name with prefixes such as is, has, can or similar.
@@ -506,7 +501,7 @@ private:
 	// [naming.pointers] Pointers and pointer-like objects (i.e. smart pointers and everything else that can be null)
 	// have an additional 'p' prefix after the context prefix, e.g. 'm_p'.
 	UPROPERTY(VisibleAnywhere)
-		USkeletalMeshComponent* m_pHeadMeshComponent = nullptr;
+	USkeletalMeshComponent* m_pHeadMeshComponent = nullptr;
 
 	FDelegateHandle m_BoundDelegateHandle;
 };
@@ -520,5 +515,5 @@ public:
 	// [doc.bp_func_lib] Always add a category for blueprint function library functions, so they are grouped properly in
 	// the Blueprint editor. Use Plugin|Class nesting.
 	UFUNCTION(BlueprintPure, Category = "OUUCodingStandard|Awesomeness")
-		static int32 GetAwesomenessThreshold();
+	static int32 GetAwesomenessThreshold();
 };

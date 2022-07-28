@@ -31,8 +31,8 @@ namespace OUU::CodingStandard::Private
 	// But even they should be put into a namespace like here.
 
 	// [order.cvar] Console variables should appear towards the top of the file, in the same groups as constants.
-	// For the most part, game code will treat them the same way, and it's easier to find the cvar declarations that way.
-	// [naming.cvar] Every console variable should start with an appropraite prefix. Use the built-in cvars as
+	// For the most part, game code will treat them the same way, and it's easier to find the cvar declarations that
+	// way. [naming.cvar] Every console variable should start with an appropraite prefix. Use the built-in cvars as
 	// reference.
 	// - r: render
 	// - s: scalability
@@ -61,10 +61,7 @@ namespace OUU::CodingStandard::Private::IsolatedSamples
 		const TArray<FString>& GetSomeArray_B();
 
 		// Bad - returning a const pointer to a const array -> overly verbose with no practical difference
-		const TArray<FString>* const GetSomeArray_C()
-		{
-			return nullptr;
-		}
+		const TArray<FString>* const GetSomeArray_C() { return nullptr; }
 
 		void GetSomeArray_C_NoBenefit()
 		{
@@ -77,12 +74,14 @@ namespace OUU::CodingStandard::Private::IsolatedSamples
 		const TArray<FString>* GetSomeArray_D();
 	};
 
-	// [func.param.types] Prefer simple to understand ways of passing paramters. When using an "unusual and clever" way to
-	// pass a parameter, document the reason (e.g. don't add explicit support for move semantics without good reason).
+	// [func.param.types] Prefer simple to understand ways of passing paramters. When using an "unusual and clever" way
+	// to pass a parameter, document the reason (e.g. don't add explicit support for move semantics without good
+	// reason).
 	//
 	// The C++ Core Guidelines F.15 make a valuable distinction between the following three kinds of C++ types:
 	// - A) Cheap or impossible to copy type (e.g. int, FUnqiuePtr<T>)
-	// - B) Cheap to move (e.g. TArray<T>, FString) OR moderate cost to move (e.g. TArray<TMap<T, U>>, BigPOD) OR don't know
+	// - B) Cheap to move (e.g. TArray<T>, FString) OR moderate cost to move (e.g. TArray<TMap<T, U>>, BigPOD) OR don't
+	// know
 	// - C) Expensive to move (e.g. BigPOD[])
 	//
 	// For all types without explicit move support, you can stick to the following reference table.
@@ -191,10 +190,10 @@ namespace OUU::CodingStandard::Private::IsolatedSamples
 		const int32 Original = 0;
 		const int32& Reference = Original;
 		auto lambda_auto = [Original,
-			ExplicitCopy = Original,
-			&ProperReference = Original,
-			AccidentalCopy = Reference,
-			AccidentalPointer = &Reference]()
+							ExplicitCopy = Original,
+							&ProperReference = Original,
+							AccidentalCopy = Reference,
+							AccidentalPointer = &Reference]()
 		{
 			// ConstCopy -> const int32
 			// ExplicitCopy -> int32
@@ -259,7 +258,8 @@ namespace OUU::CodingStandard
 	FString LexToString(EAwesomenessLevel _AwesomenessLevel)
 	{
 		// [switch.braces] Braces are optional around cases in switch/case blocks.
-		// When placing braces around a case block, the final break or return statement is placed inside the brace scope.
+		// When placing braces around a case block, the final break or return statement is placed inside the brace
+		// scope.
 		switch (_AwesomenessLevel)
 		{
 		case EAwesomenessLevel::NotAwesome:
@@ -267,20 +267,14 @@ namespace OUU::CodingStandard
 			return TEXT("NotAwesome");
 			// not to be confused with INVTEXT() macro for FText literals!
 			// return INVTEXT("NotAwesome");
-		case EAwesomenessLevel::SemiAwesome:
-			return TEXT("SemiAwesome");
-		case EAwesomenessLevel::Awesome:
-			return TEXT("Awesome");
-		default:
-			return TEXT("<invalid>");
+		case EAwesomenessLevel::SemiAwesome: return TEXT("SemiAwesome");
+		case EAwesomenessLevel::Awesome: return TEXT("Awesome");
+		default: return TEXT("<invalid>");
 		}
 	}
 
 	//---------------------------------------------------------------------------------------------------------------------
-	bool TryLexFromString(EAwesomenessLevel& _OutAwesomenessLevel, const FString& _String)
-	{
-		return false;
-	}
+	bool TryLexFromString(EAwesomenessLevel& _OutAwesomenessLevel, const FString& _String) { return false; }
 } // namespace OUU::CodingStandard
 
 // [cpp.divider.class] If a cpp file contains function definitions for multiple classes, place a separator
@@ -314,24 +308,16 @@ bool AOUUExampleCharacter::HasAllColorsPossible() const
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-void AOUUExampleCharacter::Server_SendDataToServer_Implementation()
-{
-}
+void AOUUExampleCharacter::Server_SendDataToServer_Implementation() {}
 
 //---------------------------------------------------------------------------------------------------------------------
-void AOUUExampleCharacter::Client_SendDataToClient_Implementation()
-{
-}
+void AOUUExampleCharacter::Client_SendDataToClient_Implementation() {}
 
 //---------------------------------------------------------------------------------------------------------------------
-void AOUUExampleCharacter::Multicast_SendDataToEveryone_Implementation()
-{
-}
+void AOUUExampleCharacter::Multicast_SendDataToEveryone_Implementation() {}
 
 //---------------------------------------------------------------------------------------------------------------------
-void AOUUExampleCharacter::OnRep_Score(int32 _ReplicatedScore)
-{
-}
+void AOUUExampleCharacter::OnRep_Score(int32 _ReplicatedScore) {}
 
 //---------------------------------------------------------------------------------------------------------------------
 void AOUUExampleCharacter::HandleOwnAwesomenessChanged(EAwesomenessLevel _Awesomeness)
@@ -344,7 +330,8 @@ void AOUUExampleCharacter::HandleOwnAwesomenessChanged(EAwesomenessLevel _Awesom
 	}
 
 	// ...for the specific case above you can use UE_CLOG as alternative:
-	UE_CLOG(_Awesomeness == EAwesomenessLevel::Awesome,
+	UE_CLOG(
+		_Awesomeness == EAwesomenessLevel::Awesome,
 		LogOUUCodingStandard,
 		Log,
 		TEXT("Character %s just became AWESOME!"),
@@ -386,14 +373,16 @@ bool AOUUExampleCharacter::ColorBodyPart(FName _BodyPartName, EOUUExampleBodyPar
 {
 	// [error.ensure] Prefer to use ensureMsgf and provide some context information over using ensure().
 	// ensure(_BodyPartColor != EOUUExampleBodyPartColor::Count);
-	ensureMsgf(_BodyPartColor != EOUUExampleBodyPartColor::Count,
+	ensureMsgf(
+		_BodyPartColor != EOUUExampleBodyPartColor::Count,
 		TEXT("%s - Count case must never be used to color body parts"),
 		*GetName());
 
 	// [error.check] Use checks with a message if you found some unrecoverable state that must always lead to a crash.
 	// This should be avoided in most cases, but sometimes there is no other way out.
 	// NOTE: In shipping builds this will ALWAYS lead to a crash.
-	checkf(_BodyPartColor != EOUUExampleBodyPartColor::Count,
+	checkf(
+		_BodyPartColor != EOUUExampleBodyPartColor::Count,
 		TEXT("%s - Cound case must never be used to color body parts"),
 		*GetName());
 
@@ -439,7 +428,7 @@ void AOUUExampleCharacter::SetAwesomeness(int32 _Awesomeness)
 	auto NewAwesomenessLevel = m_CharacterData.GetAwesomenessLevel();
 
 	if (NewAwesomenessLevel != AwesomenessLevelBefore)
-		// [braces.one_per_line] Follow Allman style aka one line per brace
+	// [braces.one_per_line] Follow Allman style aka one line per brace
 	{
 		OnAwesomenessChanged.Broadcast(NewAwesomenessLevel);
 	}
