@@ -140,16 +140,6 @@ enum class EOUUExampleBodyPartColor : uint8
 	Count UMETA(Hidden)
 };
 
-// [enum.cstyle] If for some reason you absolutely need a c-style enum, prefix the cases with k_ + enum name, like so:
-enum ECStyleOUUExampleBodyPartColor
-{
-	k_CStyleOUUExampleBodyPartColor_Red,
-	k_CStyleOUUExampleBodyPartColor_Green,
-	k_CStyleOUUExampleBodyPartColor_Blue,
-
-	k_CStyleOUUExampleBodyPartColor_Count
-};
-
 // [enum.range.decl] Prefer to declare an enum range when possible over integer based iteration.
 // If you do, declare it immediately after the enum itself.
 // -> see Engine/Source/Runtime/Core/Public/Misc/EnumRange.h
@@ -199,7 +189,7 @@ public:
 	 * @returns		true if the body part was found and successfully colored.
 	 */
 	UFUNCTION(BlueprintCallable)
-	virtual bool ColorBodyPart(FName _BodyPartName, EOUUExampleBodyPartColor _BodyPartColor) = 0;
+	virtual bool ColorBodyPart(FName BodyPartName, EOUUExampleBodyPartColor BodyPartColor) = 0;
 };
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -218,15 +208,15 @@ enum class EAwesomenessLevel
 // Use the following namespace structure: OUU::ModuleName or OUU::ModuleName::Private
 namespace OUU::CodingStandard
 {
-	EAwesomenessLevel AwesomenessLevelFromIntValue(int32 _Awesomeness);
+	EAwesomenessLevel AwesomenessLevelFromIntValue(int32 Awesomeness);
 
 	// [string.conv] Overload the LexToString/TryLexFromString for custom primitive string conversion instead of
 	// coming up with own names.
 	// [naming.func.param.in] Prefix function input parameters with underscores '_'.
-	FString LexToString(EAwesomenessLevel _AwesomenessLevel);
+	FString LexToString(EAwesomenessLevel AwesomenessLevel);
 
 	// [naming.func.param.out] Prefix out-by-ref-parameters with '_Out' instead of '_'.
-	bool TryLexFromString(EAwesomenessLevel& _OutAwesomenessLevel, const FString& _String);
+	bool TryLexFromString(EAwesomenessLevel& OutAwesomenessLevel, const FString& String);
 
 	/**
 	 * Track how awesome a character is.
@@ -239,15 +229,17 @@ namespace OUU::CodingStandard
 		FNumericAwesomeness() = default;
 
 		// [ctor.initalizer.inline] An initializing constructor may be inlined.
-		FNumericAwesomeness(int32 _Awesomeness, FString _AwesomenessReason) :
-			AwesomenessReason(_AwesomenessReason), Awesomeness(_Awesomeness)
+		FNumericAwesomeness(int32 InAwesomeness, FString InAwesomenessReason) :
+			AwesomenessReason(InAwesomenessReason), Awesomeness(InAwesomeness)
 		{
 		}
 
 		// [ctor.delegate] Delegate parameter contructors to a single one that takes all of them, unless impossible.
 		// [ctor.explicit] Single-argument constructors must be declared as explicit unless implicit conversion is
 		// specifically wanted. In that case, this conversion behavior needs to be documented.
-		explicit FNumericAwesomeness(int32 _Awesomeness) : FNumericAwesomeness(_Awesomeness, TEXT("unknown reason")) {}
+		explicit FNumericAwesomeness(int32 InAwesomeness) : FNumericAwesomeness(InAwesomeness, TEXT("unknown reason"))
+		{
+		}
 
 	public:
 		// [struct.functions] Structs may only have constructor, operator and conversion functions.
@@ -260,8 +252,8 @@ namespace OUU::CodingStandard
 		// as it provides the most flexibility with operands order and usage.
 		// If it needs to access private members, make it 'friend'.
 		// NOTE: Add working functionality only for '==' and '<' everything else can be inferred from them
-		friend bool operator==(const FNumericAwesomeness& _LHS, const FNumericAwesomeness& _RHS);
-		friend bool operator<(const FNumericAwesomeness& _LHS, const FNumericAwesomeness& _RHS);
+		friend bool operator==(const FNumericAwesomeness& LHS, const FNumericAwesomeness& RHS);
+		friend bool operator<(const FNumericAwesomeness& LHS, const FNumericAwesomeness& RHS);
 
 	public:
 		// Why the character is so awesome
@@ -280,14 +272,14 @@ namespace OUU::CodingStandard
 		return AwesomenessLevelFromIntValue(Awesomeness);
 	}
 
-	inline bool operator==(const FNumericAwesomeness& _LHS, const FNumericAwesomeness& _RHS)
+	inline bool operator==(const FNumericAwesomeness& LHS, const FNumericAwesomeness& RHS)
 	{
-		return _LHS.Awesomeness == _RHS.Awesomeness;
+		return LHS.Awesomeness == RHS.Awesomeness;
 	}
 
-	inline bool operator<(const FNumericAwesomeness& _LHS, const FNumericAwesomeness& _RHS)
+	inline bool operator<(const FNumericAwesomeness& LHS, const FNumericAwesomeness& RHS)
 	{
-		return _LHS.Awesomeness < _RHS.Awesomeness;
+		return LHS.Awesomeness < RHS.Awesomeness;
 	}
 
 	// [namespace.end] Add a namespace end comment. This is automatically done by clang-format, but it fails to update
@@ -301,18 +293,18 @@ namespace OUU::CodingStandard
 namespace OUU::CodingStandard::Templates
 {
 	// [naming.template.type] Template types should always be prefixed with T
-	// [naming.template.param] All template parameters should be prefixed with underscore and exposed to users via using
+	// [naming.template.param] All template parameters should be prefixed with 'In' and exposed to users via using
 	// declaration
 	// [naming.template.paramtype] Paramater types should be suffixed with 'Type' or 'Types' in case of a parameter pack
 	// [template.paramtype] Parameter types should always use 'typename' instead of 'class'
-	template <typename _ElementType, typename _AllocatorType, int32 _DefaultSlack>
+	template <typename InElementType, typename InAllocatorType, int32 InDefaultSlack>
 	struct TMyContainer
 	{
 	public:
 		// [naming.template.alias] No type prefix needed for the aliases.
-		using ElementType = _ElementType;
-		using AllocatorType = _AllocatorType;
-		static CONSTEXPR int32 DefaultSlack = _DefaultSlack;
+		using ElementType = InElementType;
+		using AllocatorType = InAllocatorType;
+		static CONSTEXPR int32 DefaultSlack = InDefaultSlack;
 
 		// [static_assert] Use static assert in templates to improve compile safety and error verbosity
 		static_assert(DefaultSlack >= 8, "A default slack size of 8 or more is required, because xyz");
@@ -392,15 +384,14 @@ public:
 	FOnAwesomenessChanged OnAwesomenessChanged;
 
 public:
-	// [naming.constant] Constants are prefixed with k_, both as members, globals or locally in functions.
 	// [member.constant.primitive] Primitive constants should be declared as constexpr, if possible.
 	// Prefer this any time over defines, c-style enums or static const values that are defined in cpp.
-	static CONSTEXPR int32 k_NumBodyParts = 2;
+	static CONSTEXPR int32 NumBodyParts = 2;
 
 	// [member.constant.complex] Complex constants (like FNames) that cannot be declared as constexpr should be declared
 	// like this:
-	static const FName k_HeadBodyPartName;
-	static const FName k_TorsoBodyPartName;
+	static const FName HeadBodyPartName;
+	static const FName TorsoBodyPartName;
 
 private:
 	struct FNestedStruct
@@ -414,7 +405,7 @@ public:
 public:
 	// [member.accessor] Prefer declaring accessor functions (getters + setters) over making member field public.
 	EAwesomenessLevel GetAwesomenessLevel() const;
-	void SetAwesomeness(int32 _Awesomeness);
+	void SetAwesomeness(int32 Awesomeness);
 
 	// Checks if all possible colors are assigned to this character in any body part
 	bool HasAllColorsPossible() const;
@@ -434,10 +425,10 @@ protected:
 
 private:
 	UFUNCTION()
-	void HandleOwnAwesomenessChanged(EAwesomenessLevel _Awesomeness);
+	void HandleOwnAwesomenessChanged(EAwesomenessLevel Awesomeness);
 
 	UFUNCTION()
-	void OnRep_Score(int32 _ReplicatedScore);
+	void OnRep_Score(int32 ReplicatedScore);
 
 	// [member.order.overrides] Overridden functions are grouped by the class where the function was first declared.
 	// Each group must start with a comment indicating the originating parent class.
@@ -452,11 +443,11 @@ private:
 	// -- AActor interface
 public:
 	void BeginPlay() override;
-	void EndPlay(EEndPlayReason::Type _EndPlayReason) override;
+	void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
 	// -- IOUUExampleColorableInterface
 public:
-	bool ColorBodyPart(FName _BodyPartName, EOUUExampleBodyPartColor _BodyPartColor) override;
+	bool ColorBodyPart(FName BodyPartName, EOUUExampleBodyPartColor BodyPartColor) override;
 
 public:
 	// [doc.delegate.instance] Do not duplicate parameter docs for delegate at the instance.
@@ -480,30 +471,28 @@ public:
 protected:
 	// [naming.func.onrep] Functions bound to property replication events are named 'OnRep_' + VariableWithoutPrefix.
 	UPROPERTY(ReplicatedUsing = OnRep_Score)
-	int32 m_Score = 0;
+	int32 Score = 0;
 
 private:
 	// [member.init] Initialize member via assignment, unless it's a default constructible struct
 	UPROPERTY(VisibleAnywhere)
-	EOUUExampleBodyPartColor m_HeadColor = EOUUExampleBodyPartColor::Red;
+	EOUUExampleBodyPartColor HeadColor = EOUUExampleBodyPartColor::Red;
 
 	UPROPERTY(VisibleAnywhere)
-	EOUUExampleBodyPartColor m_TorsoColor = EOUUExampleBodyPartColor::Red;
+	EOUUExampleBodyPartColor TorsoColor = EOUUExampleBodyPartColor::Red;
 
-	// [naming.bool] Boolean variables and member fields should not be prefixed with b as in the Epic conventions.
+	// [naming.bool] Boolean variables and member fields are prefixed with b as in the Epic conventions.
 	// Use verb as name with prefixes such as is, has, can or similar.
 	// Should be in positive form to avoid double negatives or even triple negatives.
-	bool m_WasColorChanged = false;
+	bool bWasColorChanged = false;
 
-	FCharacterData m_CharacterData;
+	FCharacterData CharacterData;
 
 	// [nullptr] Use nullptr instead of NULL macro or 0 literal in all cases.
-	// [naming.pointers] Pointers and pointer-like objects (i.e. smart pointers and everything else that can be null)
-	// have an additional 'p' prefix after the context prefix, e.g. 'm_p'.
 	UPROPERTY(VisibleAnywhere)
-	USkeletalMeshComponent* m_pHeadMeshComponent = nullptr;
+	USkeletalMeshComponent* HeadMeshComponent = nullptr;
 
-	FDelegateHandle m_BoundDelegateHandle;
+	FDelegateHandle BoundDelegateHandle;
 };
 
 //---------------------------------------------------------------------------------------------------------------------

@@ -239,28 +239,28 @@ namespace OUU::CodingStandard::Private::IsolatedSamples
 namespace OUU::CodingStandard
 {
 	//---------------------------------------------------------------------------------------------------------------------
-	EAwesomenessLevel AwesomenessLevelFromIntValue(int32 _Awesomeness)
+	EAwesomenessLevel AwesomenessLevelFromIntValue(int32 Awesomeness)
 	{
 		// [earlyreturn] Try to use early-return where possible to reduce scope nesting.
 		// This is the only case where omitting braces is permissible, unless the return value requires a line-break
-		if (_Awesomeness < 0)
+		if (Awesomeness < 0)
 			return EAwesomenessLevel::NotAwesome;
 
 		// [magic.number] Do not use magic numbers. Instad, use named global constants or cvars.
 		// if (Awesomeness < 100)
-		if (_Awesomeness < Private::CVar_MinAwesomeness.GetValueOnAnyThread())
+		if (Awesomeness < Private::CVar_MinAwesomeness.GetValueOnAnyThread())
 			return EAwesomenessLevel::SemiAwesome;
 
 		return EAwesomenessLevel::Awesome;
 	}
 
 	//---------------------------------------------------------------------------------------------------------------------
-	FString LexToString(EAwesomenessLevel _AwesomenessLevel)
+	FString LexToString(EAwesomenessLevel AwesomenessLevel)
 	{
 		// [switch.braces] Braces are optional around cases in switch/case blocks.
 		// When placing braces around a case block, the final break or return statement is placed inside the brace
 		// scope.
-		switch (_AwesomenessLevel)
+		switch (AwesomenessLevel)
 		{
 		case EAwesomenessLevel::NotAwesome:
 			// [string.literal] String literals in production code should always use the TEXT() macro
@@ -274,7 +274,7 @@ namespace OUU::CodingStandard
 	}
 
 	//---------------------------------------------------------------------------------------------------------------------
-	bool TryLexFromString(EAwesomenessLevel& _OutAwesomenessLevel, const FString& _String) { return false; }
+	bool TryLexFromString(EAwesomenessLevel& OutAwesomenessLevel, const FString& String) { return false; }
 } // namespace OUU::CodingStandard
 
 // [cpp.divider.class] If a cpp file contains function definitions for multiple classes, place a separator
@@ -283,15 +283,15 @@ namespace OUU::CodingStandard
 //---------------------------------------------------------------------------------------------------------------------
 // AOUUExampleCharacter
 //---------------------------------------------------------------------------------------------------------------------
-const FName AOUUExampleCharacter::k_HeadBodyPartName = TEXT("Head");
-const FName AOUUExampleCharacter::k_TorsoBodyPartName = TEXT("Body");
+const FName AOUUExampleCharacter::HeadBodyPartName = TEXT("Head");
+const FName AOUUExampleCharacter::TorsoBodyPartName = TEXT("Body");
 
 //---------------------------------------------------------------------------------------------------------------------
 AOUUExampleCharacter::AOUUExampleCharacter()
 {
-	m_pHeadMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("HeadMesh"));
+	HeadMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("HeadMesh"));
 	// Attach the head mesh to the character mesh = body mesh
-	m_pHeadMeshComponent->SetupAttachment(GetMesh());
+	HeadMeshComponent->SetupAttachment(GetMesh());
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -301,7 +301,7 @@ bool AOUUExampleCharacter::HasAllColorsPossible() const
 	// you should declare the enum ranges statically -> see [enum.range.decl]
 	for (auto Color : TEnumRange<EOUUExampleBodyPartColor>())
 	{
-		if (m_HeadColor != Color && m_TorsoColor != Color)
+		if (HeadColor != Color && TorsoColor != Color)
 			return false;
 	}
 	return true;
@@ -320,18 +320,18 @@ void AOUUExampleCharacter::Multicast_SendDataToEveryone_Implementation() {}
 void AOUUExampleCharacter::OnRep_Score(int32 _ReplicatedScore) {}
 
 //---------------------------------------------------------------------------------------------------------------------
-void AOUUExampleCharacter::HandleOwnAwesomenessChanged(EAwesomenessLevel _Awesomeness)
+void AOUUExampleCharacter::HandleOwnAwesomenessChanged(EAwesomenessLevel Awesomeness)
 {
 	// [braces.always] Always use braces, even for single line if-statements.
 	// only exception: early-returns -> see [earlyreturn]
-	if (_Awesomeness == EAwesomenessLevel::Awesome)
+	if (Awesomeness == EAwesomenessLevel::Awesome)
 	{
 		UE_LOG(LogOUUCodingStandard, Log, TEXT("Character %s just became AWESOME!"), *GetName());
 	}
 
 	// ...for the specific case above you can use UE_CLOG as alternative:
 	UE_CLOG(
-		_Awesomeness == EAwesomenessLevel::Awesome,
+		Awesomeness == EAwesomenessLevel::Awesome,
 		LogOUUCodingStandard,
 		Log,
 		TEXT("Character %s just became AWESOME!"),
@@ -354,27 +354,27 @@ void AOUUExampleCharacter::BeginPlay()
 
 	// [naming.delegate.func] Functions that are bound to delegates are called 'Handle' + optional object hint +
 	// Delegate name without 'On' prefix, e.g. this->OnAwesomenessChanged becomes HandleOwnAwesomenesssChanged
-	m_BoundDelegateHandle =
+	BoundDelegateHandle =
 		this->OnAwesomenessChanged.AddUObject(this, &AOUUExampleCharacter::HandleOwnAwesomenessChanged);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-void AOUUExampleCharacter::EndPlay(EEndPlayReason::Type _EndPlayReason)
+void AOUUExampleCharacter::EndPlay(EEndPlayReason::Type EndPlayReason)
 {
-	Super::EndPlay(_EndPlayReason);
+	Super::EndPlay(EndPlayReason);
 
 	// [delegate.cleanup] Always clean up bound delegates
-	this->OnAwesomenessChanged.Remove(m_BoundDelegateHandle);
-	m_BoundDelegateHandle.Reset();
+	this->OnAwesomenessChanged.Remove(BoundDelegateHandle);
+	BoundDelegateHandle.Reset();
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-bool AOUUExampleCharacter::ColorBodyPart(FName _BodyPartName, EOUUExampleBodyPartColor _BodyPartColor)
+bool AOUUExampleCharacter::ColorBodyPart(FName BodyPartName, EOUUExampleBodyPartColor BodyPartColor)
 {
 	// [error.ensure] Prefer to use ensureMsgf and provide some context information over using ensure().
-	// ensure(_BodyPartColor != EOUUExampleBodyPartColor::Count);
+	// ensure(BodyPartColor != EOUUExampleBodyPartColor::Count);
 	ensureMsgf(
-		_BodyPartColor != EOUUExampleBodyPartColor::Count,
+		BodyPartColor != EOUUExampleBodyPartColor::Count,
 		TEXT("%s - Count case must never be used to color body parts"),
 		*GetName());
 
@@ -382,7 +382,7 @@ bool AOUUExampleCharacter::ColorBodyPart(FName _BodyPartName, EOUUExampleBodyPar
 	// This should be avoided in most cases, but sometimes there is no other way out.
 	// NOTE: In shipping builds this will ALWAYS lead to a crash.
 	checkf(
-		_BodyPartColor != EOUUExampleBodyPartColor::Count,
+		BodyPartColor != EOUUExampleBodyPartColor::Count,
 		TEXT("%s - Cound case must never be used to color body parts"),
 		*GetName());
 
@@ -394,13 +394,13 @@ bool AOUUExampleCharacter::ColorBodyPart(FName _BodyPartName, EOUUExampleBodyPar
 
 	// STUDIO Start username: Description of the change -> Focus on the reasoning.
 #if 0
-	if (_BodyPartName == k_HeadBodyPartName)
+	if (BodyPartName == HeadBodyPartName)
 	{
-		m_HeadColor = _BodyPartColor;
+		HeadColor = BodyPartColor;
 	}
-	else if (_BodyPartName == k_TorsoBodyPartName)
+	else if (BodyPartName == TorsoBodyPartName)
 	{
-		m_TorsoColor = _BodyPartColor;
+		TorsoColor = BodyPartColor;
 	}
 #endif
 	// STUDIO End
@@ -408,7 +408,7 @@ bool AOUUExampleCharacter::ColorBodyPart(FName _BodyPartName, EOUUExampleBodyPar
 	// [comment.todo] If you leave todo comments, start with #TODO, so we can find them and add a developer that should
 	// take care of the todo.
 	// #TODO username: Update mesh materials based on enum state
-	m_WasColorChanged = true;
+	bWasColorChanged = true;
 
 	return false;
 }
@@ -416,16 +416,16 @@ bool AOUUExampleCharacter::ColorBodyPart(FName _BodyPartName, EOUUExampleBodyPar
 //---------------------------------------------------------------------------------------------------------------------
 EAwesomenessLevel AOUUExampleCharacter::GetAwesomenessLevel() const
 {
-	return m_CharacterData.GetAwesomenessLevel();
+	return CharacterData.GetAwesomenessLevel();
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-void AOUUExampleCharacter::SetAwesomeness(int32 _Awesomeness)
+void AOUUExampleCharacter::SetAwesomeness(int32 Awesomeness)
 {
-	auto AwesomenessLevelBefore = m_CharacterData.GetAwesomenessLevel();
+	auto AwesomenessLevelBefore = CharacterData.GetAwesomenessLevel();
 
-	m_CharacterData = FCharacterData(_Awesomeness, TEXT("set by SetAwesomeness"));
-	auto NewAwesomenessLevel = m_CharacterData.GetAwesomenessLevel();
+	CharacterData = FCharacterData(Awesomeness, TEXT("set by SetAwesomeness"));
+	auto NewAwesomenessLevel = CharacterData.GetAwesomenessLevel();
 
 	if (NewAwesomenessLevel != AwesomenessLevelBefore)
 	// [braces.one_per_line] Follow Allman style aka one line per brace
@@ -441,7 +441,7 @@ void AOUUExampleCharacter::SetAwesomeness(int32 _Awesomeness)
 // The output parameter OutLifetimeProps must not be renamed, otherwise the DOREPLIFETIME macros do not work.
 void AOUUExampleCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	DOREPLIFETIME(AOUUExampleCharacter, m_Score);
+	DOREPLIFETIME(AOUUExampleCharacter, Score);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
