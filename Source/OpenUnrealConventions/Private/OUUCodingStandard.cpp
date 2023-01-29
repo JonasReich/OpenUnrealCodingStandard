@@ -44,6 +44,9 @@ namespace OUU::CodingStandard::Private
 		TEXT("ouu.CodingStandard.MinAwesomeness"),
 		100,
 		TEXT("Sample cvar that defines the minimum int value above 0 at which true awesomeness starts."));
+
+	// [doc.namespace] Namespaces do not need doc comments at the beginning, but ending braces should be followed by a
+	// matching comment like this (will be auto-enforced by clang-format).
 } // namespace OUU::CodingStandard::Private
 
 namespace OUU::CodingStandard::Private::IsolatedSamples
@@ -176,8 +179,7 @@ namespace OUU::CodingStandard::Private::IsolatedSamples
 
 		// [lambda.dangling] biggest problem in production is creating dangling references
 		// by capturing objects by reference that die before the lambda gets called
-		auto dangling_lambda = [ExternalFoo]()
-		{
+		auto dangling_lambda = [ExternalFoo]() {
 			// will ExternalFoo still be valid when the lambda is called?
 		};
 
@@ -194,8 +196,7 @@ namespace OUU::CodingStandard::Private::IsolatedSamples
 							ExplicitCopy = Original,
 							&ProperReference = Original,
 							AccidentalCopy = Reference,
-							AccidentalPointer = &Reference]()
-		{
+							AccidentalPointer = &Reference]() {
 			// ConstCopy -> const int32
 			// ExplicitCopy -> int32
 			// ProperReference -> const int32 &
@@ -228,7 +229,8 @@ namespace OUU::CodingStandard::Private::IsolatedSamples
 	{
 		// [macro] Macros should be avoided at all costs.
 		// Keep their scope as small as possible (undef as soon as possible).
-		// Use UPPER_SNAKE_CASE for macro names.
+
+		// [naming.macro] Use UPPER_SNAKE_CASE for macro names.
 #define LOCAL_MACRO(x) (42 + x)
 		int32 LocalInt = LOCAL_MACRO(0);
 #undef LOCAL_MACRO
@@ -287,11 +289,20 @@ const FName AOUUExampleCharacter::HeadBodyPartName = TEXT("Head");
 const FName AOUUExampleCharacter::TorsoBodyPartName = TEXT("Body");
 
 //---------------------------------------------------------------------------------------------------------------------
-AOUUExampleCharacter::AOUUExampleCharacter()
+AOUUExampleCharacter::AOUUExampleCharacter() : AOUUExampleCharacter(nullptr, EOUUExampleBodyPartColor::Red) {}
+
+//---------------------------------------------------------------------------------------------------------------------
+// [ctor.overload] You may overload the constructor, but should always forward parameters to one declaration if
+// possible.
+// [ctor.initialization] Member initialization should only happen in a single constructor. Other constructors should
+// call the same delegating constructor to initialize any member variables.
+AOUUExampleCharacter::AOUUExampleCharacter(USkeletalMesh* InSkeletalMesh, EOUUExampleBodyPartColor InHeadColor) :
+	HeadColor(InHeadColor)
 {
 	HeadMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("HeadMesh"));
 	// Attach the head mesh to the character mesh = body mesh
 	HeadMeshComponent->SetupAttachment(GetMesh());
+	HeadMeshComponent->SetSkeletalMesh(InSkeletalMesh);
 }
 
 //---------------------------------------------------------------------------------------------------------------------

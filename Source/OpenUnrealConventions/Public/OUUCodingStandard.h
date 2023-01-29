@@ -62,6 +62,9 @@
 // - OUU for everything related to OpenUnrealUtilities plugin
 // Classes may also receive the module prefix to avoid name clashes.
 
+// [naming.case]
+// Identifier names should all use PascalCase, with some exceptions for prefixes (e.g. m_MemberVariable) and MACROS
+
 // [basic.doc] Write docs for all public API identifiers, especially types and functions. General rule:
 // - Multi line typedoc comments for all types and functions.
 // - Single line comments for fields and constants.
@@ -101,7 +104,8 @@
 #include "OUUCodingStandard.generated.h"
 
 //---------------------------------------------------------------------------------------------------------------------
-// [header.fwd] Use forward-declarations instead of includes wherever possible
+// [header.fwd] Use forward-declarations instead of includes wherever possible.
+// Forward declarations should always be made here instead of inline.
 class USkeletalMeshComponent;
 
 // [macro.decl] Macro based declarations that do not rely on types declared in the header file itself should always come
@@ -109,10 +113,14 @@ class USkeletalMeshComponent;
 // (e.g. log categories, delegates)
 DECLARE_LOG_CATEGORY_EXTERN(LogOUUCodingStandard, Log, All);
 
-// [naming.delegate.type] Delegate types have two permissible naming schemes:
-// 1. FFooEvent -> Used for generic groups of events that share a common signature, e.g. FFileOperationEvent
-// 2. FOnFoo -> Used for single purpose events, matching the delegate instance name, e.g. FOnActorDestroyed
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSomethingHappenedEvent);
+namespace OUU::CodingStandard
+{
+	// [naming.delegate.type] Delegate types have two permissible naming schemes:
+	// 1. FFooEvent -> Used for generic groups of events that share a common signature, e.g. FFileOperationEvent
+	// 2. FOnFoo -> Used for single purpose events, matching the delegate instance name, e.g. FOnActorDestroyed
+	DECLARE_DELEGATE(FFileOperationEvent);
+	DECLARE_DELEGATE(FOnActorDestroyed);
+} // namespace OUU::CodingStandard
 
 //---------------------------------------------------------------------------------------------------------------------
 // [doc.enum] Write type docs for enums
@@ -387,7 +395,11 @@ public:
 	static const FName HeadBodyPartName;
 	static const FName TorsoBodyPartName;
 
+	// [uclass.ctor] Prefer the parameterless default constructor for uobjects instead of the one using
+	// FObjectInitializer.
 	AOUUExampleCharacter();
+
+	AOUUExampleCharacter(USkeletalMesh* InSkeletalMesh, EOUUExampleBodyPartColor InHeadColor);
 
 	// [doc.delegate.instance] Do not duplicate parameter docs for delegate at the instance.
 	// Instad, focus on the things that changes between instances.
@@ -456,8 +468,10 @@ private:
 
 	// [member.init] Initialize member via assignment, unless it's a default constructible struct
 	UPROPERTY(VisibleAnywhere)
-	EOUUExampleBodyPartColor HeadColor = EOUUExampleBodyPartColor::Red;
+	EOUUExampleBodyPartColor HeadColor;
 
+	// [member.init] Initialize member via assignment, unless it's a default constructible struct or initialized from a
+	// constructor parameter.
 	UPROPERTY(VisibleAnywhere)
 	EOUUExampleBodyPartColor TorsoColor = EOUUExampleBodyPartColor::Red;
 
