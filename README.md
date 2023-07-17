@@ -1,5 +1,7 @@
 # Open Unreal Coding Standard
 
+![Open Unreal Coding Standard logo](./Resources/oucpp_wide.png)
+
 ## Methodology
 The coding standard consists of 'live' source code files that are checked in along with the project and participates in compilation.
 They serve as example for developers and are always available in the IDE during development.
