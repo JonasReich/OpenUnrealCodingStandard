@@ -7,7 +7,7 @@ public class OUUCodingStandard : ModuleRules
 {
 	public OUUCodingStandard(ReadOnlyTargetRules Target) : base(Target)
 	{
-		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+		// PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		// [build.cs.dep] Prefer declaring dependencies as private if possible.
 		PrivateDependencyModuleNames.AddRange(
