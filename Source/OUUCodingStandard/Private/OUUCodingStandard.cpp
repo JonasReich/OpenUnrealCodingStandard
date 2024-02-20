@@ -10,8 +10,13 @@
 // [order.cpp] Source files should match the header order as much as possible.
 // Symbols that are only declared in the source files should be avoided or put into the following order:
 // - includes
-// - source declarations + inline defintions of source declarations
+// - source declarations + inline definitions of source declarations
 // - definitions of header declarations
+
+// [resharper.disables] These disables hide some of the ReSharper static code inspections in this file.
+// They are not a good example for responsible coding.
+// ReSharper disable CppDeclaratorNeverUsed
+// ReSharper disable CppLambdaCaptureNeverUsed
 
 // [cpp.include.header] Always include the header file corresponding to your cpp file first.
 #include "OUUCodingStandard.h"
@@ -32,7 +37,7 @@ namespace OUU::CodingStandard::Private
 
 	// [order.cvar] Console variables should appear towards the top of the file, in the same groups as constants.
 	// For the most part, game code will treat them the same way, and it's easier to find the cvar declarations that
-	// way. [naming.cvar] Every console variable should start with an appropraite prefix. Use the built-in cvars as
+	// way. [naming.cvar] Every console variable should start with an appropriate prefix. Use the built-in cvars as
 	// reference.
 	// - r: render
 	// - s: scalability
@@ -60,10 +65,11 @@ namespace OUU::CodingStandard::Private::IsolatedSamples
 		const TArray<FString> GetSomeArray_A();
 
 		// Fine - returning a reference to a const array
-		// -> user can decide wether to read exisiting array elements or create a working copy.
+		// -> user can decide whether to read existing array elements or create a working copy.
 		const TArray<FString>& GetSomeArray_B();
 
 		// Bad - returning a const pointer to a const array -> overly verbose with no practical difference
+		// ReSharper disable once CppConstValueFunctionReturnType
 		const TArray<FString>* const GetSomeArray_C() { return nullptr; }
 
 		void GetSomeArray_C_NoBenefit()
@@ -77,7 +83,7 @@ namespace OUU::CodingStandard::Private::IsolatedSamples
 		const TArray<FString>* GetSomeArray_D();
 	};
 
-	// [func.param.types] Prefer simple to understand ways of passing paramters. When using an "unusual and clever" way
+	// [func.param.types] Prefer simple to understand ways of passing parameters. When using an "unusual and clever" way
 	// to pass a parameter, document the reason (e.g. don't add explicit support for move semantics without good
 	// reason).
 	//
@@ -118,7 +124,7 @@ namespace OUU::CodingStandard::Private::IsolatedSamples
 		// [auto] almost always auto: Prefer using auto especially in cases where...
 		// - the type can be easily inferred from context (e.g. cast results)
 		// - the exact type is not important (e.g. because it's only forwarded to another function)
-		// - spelling out the type name would be too verbose (e.g. tempalte/iterator types)
+		// - spelling out the type name would be too verbose (e.g. template/iterator types)
 
 		// type is already explicit on right side of assignment
 		auto* pMeshComponent = NewObject<USkeletalMeshComponent>();
@@ -153,7 +159,7 @@ namespace OUU::CodingStandard::Private::IsolatedSamples
 		// [auto.qualifiers] ALWAYS mark auto with the appropriate qualifiers: const, &, * - even if it's superfluous
 		int32 Value;
 		int32* Pointer = &Value;
-		int32& Reference = Value;
+		const int32& Reference = Value;
 		auto& ProperReference = Value;
 		auto& EnforcedReference = Reference;
 		auto* ExplicitPointer = Pointer;
@@ -215,13 +221,15 @@ namespace OUU::CodingStandard::Private::IsolatedSamples
 		// [numeric.limits] Use TNumericLimits instead of #defines such as FLT_MAX
 		// -> see http://api.unrealengine.com/INT/API/Runtime/Core/Math/TNumericLimits/
 		// e.g. For all floating point types
-		const float MaxPositiveFloatValue = TNumericLimits<float>::Max();
-		const float MinPositiveFloatValue = TNumericLimits<float>::Min();
-		const float MinNegativeFloatValue = TNumericLimits<float>::Lowest();
+		// ReSharper disable CppDeclaratorNeverUsed
+		constexpr float MaxPositiveFloatValue = TNumericLimits<float>::Max();
+		constexpr float MinPositiveFloatValue = TNumericLimits<float>::Min();
+		constexpr float MinNegativeFloatValue = TNumericLimits<float>::Lowest();
 		// E.g. for integral types
-		const int32 MaxPositiveIntValue = TNumericLimits<int32>::Max();
+		constexpr int32 MaxPositiveIntValue = TNumericLimits<int32>::Max();
 		// This is the same as Lowest() for all integral types.
-		const int32 MinNegativeIntValue = TNumericLimits<int32>::Min();
+		constexpr int32 MinNegativeIntValue = TNumericLimits<int32>::Min();
+		// ReSharper restore CppDeclaratorNeverUsed
 	}
 
 	//---------------------------------------------------------------------------------------------------------------------
@@ -249,7 +257,7 @@ namespace OUU::CodingStandard
 		if (Awesomeness < 0)
 			return EAwesomenessLevel::NotAwesome;
 
-		// [magic.number] Do not use magic numbers. Instad, use named global constants or cvars.
+		// [magic.number] Do not use magic numbers. Instead, use named global constants or cvars.
 		// if (Awesomeness < 100)
 		if (Awesomeness < Private::CVar_MinAwesomeness.GetValueOnAnyThread())
 			return EAwesomenessLevel::SemiAwesome;
@@ -314,13 +322,13 @@ EAwesomenessLevel AOUUExampleCharacter::GetAwesomenessLevel() const
 //---------------------------------------------------------------------------------------------------------------------
 void AOUUExampleCharacter::SetAwesomeness(int32 Awesomeness)
 {
-	auto AwesomenessLevelBefore = CharacterData.GetAwesomenessLevel();
+	const auto AwesomenessLevelBefore = CharacterData.GetAwesomenessLevel();
 
 	CharacterData = FCharacterData(Awesomeness, TEXT("set by SetAwesomeness"));
-	auto NewAwesomenessLevel = CharacterData.GetAwesomenessLevel();
+	const auto NewAwesomenessLevel = CharacterData.GetAwesomenessLevel();
 
 	if (NewAwesomenessLevel != AwesomenessLevelBefore)
-	// [braces.one_per_line] Follow Allman style aka one line per brace
+	// [braces.one_per_line] Follow "Allman" style aka one line per brace
 	{
 		OnAwesomenessChanged.Broadcast(NewAwesomenessLevel);
 	}
@@ -331,7 +339,7 @@ bool AOUUExampleCharacter::HasAllColorsPossible() const
 {
 	// [enum.range.use] If you have functions like this that need to iterate over all possible cases of an enum,
 	// you should declare the enum ranges statically -> see [enum.range.decl]
-	for (auto Color : TEnumRange<EOUUExampleBodyPartColor>())
+	for (const auto Color : TEnumRange<EOUUExampleBodyPartColor>())
 	{
 		if (HeadColor != Color && TorsoColor != Color)
 			return false;
@@ -354,7 +362,7 @@ void AOUUExampleCharacter::BeginPlay()
 	UE_LOG(LogOUUCodingStandard, Verbose, TEXT("AOUUExampleCharacter::BeginPlay - %s"), *GetName());
 
 	// [naming.delegate.func] Functions that are bound to delegates are called 'Handle' + optional object hint +
-	// Delegate name without 'On' prefix, e.g. this->OnAwesomenessChanged becomes HandleOwnAwesomenesssChanged
+	// Delegate name without 'On' prefix, e.g. this->OnAwesomenessChanged becomes HandleOwnAwesomenessChanged
 	BoundDelegateHandle =
 		this->OnAwesomenessChanged.AddUObject(this, &AOUUExampleCharacter::HandleOwnAwesomenessChanged);
 }
@@ -424,7 +432,7 @@ void AOUUExampleCharacter::Client_SendDataToClient_Implementation() {}
 void AOUUExampleCharacter::Multicast_SendDataToEveryone_Implementation() {}
 
 //---------------------------------------------------------------------------------------------------------------------
-void AOUUExampleCharacter::HandleOwnAwesomenessChanged(EAwesomenessLevel Awesomeness)
+void AOUUExampleCharacter::HandleOwnAwesomenessChanged(EAwesomenessLevel Awesomeness) const
 {
 	// [braces.always] Always use braces, even for single line if-statements.
 	// only exception: early-returns -> see [earlyreturn]

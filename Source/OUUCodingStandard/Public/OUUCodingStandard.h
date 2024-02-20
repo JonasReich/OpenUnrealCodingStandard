@@ -9,9 +9,9 @@
 // https://docs.unrealengine.com/latest/INT/Programming/Development/CodingStandard/
 
 // [basic.language] Use US English for all names and comments.
-//  BAD -> FColor SpezialisierteFarbe;
-//  BAD -> FColor SpecialisedColour;
-//  GOOD -> FColor SpecializedColor;
+//  BAD:    FColor SpezialisierteFarbe;
+//  BAD:    FColor SpecialisedColour;
+//  GOOD:   FColor SpecializedColor;
 
 // [basic.format] Auto-format all of your source-files using the clang-format files and application provided with the
 // project. Any rules enforced by the clang-format are omitted from this file.
@@ -51,7 +51,7 @@
 
 // [basic.disable_code] Never check-in commented-out code to deactivate it.
 // Use preprocessor guards or completely remove the code instead.
-// There is only one exception: Code examples accompanied by descriptory comments (e.g. in API docs).
+// There is only one exception: Code examples accompanied by descriptive comments (e.g. in API docs).
 
 // [basic.naming]
 // Identifier names should be short but descriptive. Avoid abbreviations, slang or anything else that might lead to
@@ -63,7 +63,8 @@
 // Classes may also receive the module prefix to avoid name clashes.
 
 // [naming.case]
-// Identifier names should all use PascalCase, with some exceptions for prefixes (e.g. m_MemberVariable) and MACROS
+// Identifiers should all use PascalCase_WithUnderscores, with an exception for MACROS, which should be
+// ALL_CAPS_WITH_UNDERSCORES
 
 // [basic.doc] Write docs for all public API identifiers, especially types and functions. General rule:
 // - Multi line typedoc comments for all types and functions.
@@ -172,7 +173,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(
 
 // [naming.interface.uclass] Same as the corresponding IInterface class but with changed type prefix (U instead of I).
 // [doc.interface.uclass] The UInterface does not need a type comment, as it's mainly required for the reflection data.
-// [interface.cpponly] Mark intefaces as CannotImplementInterfaceInBlueprint if possible.
+// [interface.cpponly] Mark interfaces as CannotImplementInterfaceInBlueprint if possible.
 // This makes it possible to use regular casts and invoke functions directly instead of relying on Execute_ functions.
 UINTERFACE(meta = (CannotImplementInterfaceInBlueprint))
 class UOUUExampleColorableInterface : public UInterface
@@ -189,11 +190,11 @@ class IOUUExampleColorableInterface
 	GENERATED_BODY()
 public:
 	// [doc.function] Function declarations should also be documented with multiline type-doc comments.
-	// Document parameters and return values with @param and @return notation respectively.
+	// Document parameters and return values with @param and @return(s) notation respectively.
 	/**
 	 * Color a body part by name.
-	 * @param		_BodyPartName	Name ID of the body part to be colored.
-	 * @param		_BodyPartColor	Color preset to apply to the body-part.
+	 * @param		BodyPartName	Name ID of the body part to be colored.
+	 * @param		BodyPartColor	Color preset to apply to the body-part.
 	 * @returns		true if the body part was found and successfully colored.
 	 */
 	UFUNCTION(BlueprintCallable)
@@ -220,10 +221,11 @@ namespace OUU::CodingStandard
 
 	// [string.conv] Overload the LexToString/TryLexFromString for custom primitive string conversion instead of
 	// coming up with own names.
-	// [naming.func.param.in] Prefix function input parameters with underscores '_'.
-	FString LexToString(EAwesomenessLevel AwesomenessLevel);
+	// [naming.func.param.in] Optionally prefix function input parameters with 'In' to distinguish them from locals and
+	// members.
+	FString LexToString(EAwesomenessLevel InAwesomenessLevel);
 
-	// [naming.func.param.out] Prefix out-by-ref-parameters with '_Out' instead of '_'.
+	// [naming.func.param.out] Always prefix out-by-ref-parameters with 'Out'.
 	bool TryLexFromString(EAwesomenessLevel& OutAwesomenessLevel, const FString& String);
 
 	/**
@@ -236,13 +238,13 @@ namespace OUU::CodingStandard
 		// [ctor.default] Use default notation instead of declaring an empty bodied constructor.
 		FNumericAwesomeness() = default;
 
-		// [ctor.initalizer.inline] An initializing constructor may be inlined.
-		FNumericAwesomeness(int32 InAwesomeness, FString InAwesomenessReason) :
+		// [ctor.initializer.inline] An initializing constructor may be inlined.
+		FNumericAwesomeness(int32 InAwesomeness, const FString& InAwesomenessReason) :
 			AwesomenessReason(InAwesomenessReason), Awesomeness(InAwesomeness)
 		{
 		}
 
-		// [ctor.delegate] Delegate parameter contructors to a single one that takes all of them, unless impossible.
+		// [ctor.delegate] Delegate parameter constructors to a single one that takes all of them, unless impossible.
 		// [ctor.explicit] Single-argument constructors must be declared as explicit unless implicit conversion is
 		// specifically wanted. In that case, this conversion behavior needs to be documented.
 		explicit FNumericAwesomeness(int32 InAwesomeness) : FNumericAwesomeness(InAwesomeness, TEXT("unknown reason"))
@@ -301,7 +303,7 @@ namespace OUU::CodingStandard::Templates
 	// [naming.template.type] Template types should always be prefixed with T
 	// [naming.template.param] All template parameters should be prefixed with 'In' and exposed to users via using
 	// declaration
-	// [naming.template.paramtype] Paramater types should be suffixed with 'Type' or 'Types' in case of a parameter pack
+	// [naming.template.paramtype] Parameter types should be suffixed with 'Type' or 'Types' in case of a parameter pack
 	// [template.paramtype] Parameter types should always use 'typename' instead of 'class'
 	template <typename InElementType, typename InAllocatorType, int32 InDefaultSlack>
 	struct TMyContainer
@@ -395,7 +397,7 @@ public:
 	static const FName HeadBodyPartName;
 	static const FName TorsoBodyPartName;
 
-	// [uclass.ctor] Prefer the parameterless default constructor for uobjects instead of the one using
+	// [uclass.ctor] Prefer the parameterless default constructor for UObjects instead of the one using
 	// FObjectInitializer.
 	AOUUExampleCharacter();
 
@@ -489,7 +491,7 @@ private:
 	FDelegateHandle BoundDelegateHandle;
 
 	UFUNCTION()
-	void HandleOwnAwesomenessChanged(EAwesomenessLevel Awesomeness);
+	void HandleOwnAwesomenessChanged(EAwesomenessLevel Awesomeness) const;
 
 	UFUNCTION()
 	void OnRep_Score(int32 ReplicatedScore);
