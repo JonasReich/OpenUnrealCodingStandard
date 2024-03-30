@@ -17,6 +17,8 @@
 // They are not a good example for responsible coding.
 // ReSharper disable CppDeclaratorNeverUsed
 // ReSharper disable CppLambdaCaptureNeverUsed
+// ReSharper disable CppMemberFunctionMayBeStatic
+// ReSharper disable CommentTypo
 
 // [cpp.include.header] Always include the header file corresponding to your cpp file first.
 #include "OUUCodingStandard.h"
@@ -195,6 +197,7 @@ namespace OUU::CodingStandard::Private::IsolatedSamples
 		// auto Lambda = [&]() {};
 		// auto Lambda = [=]() {};
 
+		// ReSharper disable once CppVariableCanBeMadeConstexpr
 		// [lambda.capture.auto] Cheat sheet for capture type deduction:
 		const int32 Original = 0;
 		const int32& Reference = Original;
@@ -221,7 +224,6 @@ namespace OUU::CodingStandard::Private::IsolatedSamples
 		// [numeric.limits] Use TNumericLimits instead of #defines such as FLT_MAX
 		// -> see http://api.unrealengine.com/INT/API/Runtime/Core/Math/TNumericLimits/
 		// e.g. For all floating point types
-		// ReSharper disable CppDeclaratorNeverUsed
 		constexpr float MaxPositiveFloatValue = TNumericLimits<float>::Max();
 		constexpr float MinPositiveFloatValue = TNumericLimits<float>::Min();
 		constexpr float MinNegativeFloatValue = TNumericLimits<float>::Lowest();
@@ -229,7 +231,6 @@ namespace OUU::CodingStandard::Private::IsolatedSamples
 		constexpr int32 MaxPositiveIntValue = TNumericLimits<int32>::Max();
 		// This is the same as Lowest() for all integral types.
 		constexpr int32 MinNegativeIntValue = TNumericLimits<int32>::Min();
-		// ReSharper restore CppDeclaratorNeverUsed
 	}
 
 	//---------------------------------------------------------------------------------------------------------------------
