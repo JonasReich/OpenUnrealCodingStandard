@@ -46,8 +46,6 @@
 
 // [basic.stl] Unreal provides custom versions of most types and features provided by the C++ STL. Always prefer
 // Unreal's types as it will make it easier to interface with existing Unreal code.
-// Using Epic's macro wrappers such as CONSTEXPR instead of the built-in keywords is also encouraged for more portable
-// code.
 
 // [basic.disable_code] Never check-in commented-out code to deactivate it.
 // Use preprocessor guards or completely remove the code instead.
@@ -312,7 +310,7 @@ namespace OUU::CodingStandard::Templates
 		// [naming.template.alias] No type prefix needed for the aliases.
 		using ElementType = InElementType;
 		using AllocatorType = InAllocatorType;
-		static CONSTEXPR int32 DefaultSlack = InDefaultSlack;
+		static constexpr int32 DefaultSlack = InDefaultSlack;
 
 		// [static_assert] Use static assert in templates to improve compile safety and error verbosity
 		static_assert(DefaultSlack >= 8, "A default slack size of 8 or more is required, because xyz");
@@ -390,7 +388,7 @@ public:
 
 	// [member.constant.primitive] Primitive constants should be declared as constexpr, if possible.
 	// Prefer this any time over defines, c-style enums or static const values that are defined in cpp.
-	static CONSTEXPR int32 NumBodyParts = 2;
+	static constexpr int32 NumBodyParts = 2;
 
 	// [member.constant.complex] Complex constants (like FNames) that cannot be declared as constexpr should be declared
 	// like this:
