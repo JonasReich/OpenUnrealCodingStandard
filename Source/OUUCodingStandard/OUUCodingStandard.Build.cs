@@ -7,7 +7,12 @@ public class OUUCodingStandard : ModuleRules
 {
 	public OUUCodingStandard(ReadOnlyTargetRules Target) : base(Target)
 	{
-		// PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+		IWYUSupport = IWYUSupport.Full;
+
+#if UE_5_4_OR_LATER
+		bWarningsAsErrors = true;
+#endif
 
 		// [build.cs.dep] Prefer declaring dependencies as private if possible.
 		PrivateDependencyModuleNames.AddRange(
