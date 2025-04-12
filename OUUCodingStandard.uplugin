@@ -1,24 +1,24 @@
 {
-  "FileVersion": 3,
-  "Version": 1,
-  "VersionName": "1.0",
-  "FriendlyName": "OUU Coding Standard",
-  "Description": "Unreal C++ Coding Standard by Example",
-  "Category": "Other",
-  "CreatedBy": "Jonas Reich",
-  "CreatedByURL": "",
-  "DocsURL": "",
-  "MarketplaceURL": "",
-  "SupportURL": "",
-  "CanContainContent": false,
-  "IsBetaVersion": false,
-  "IsExperimentalVersion": false,
-  "Installed": false,
-  "Modules": [
-    {
-      "Name": "OUUCodingStandard",
-      "Type": "Runtime",
-      "LoadingPhase": "Default"
-    }
-  ]
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0.0",
+	"FriendlyName": "OUU Coding Standard",
+	"Description": "Unreal C++ Coding Standard by Example",
+	"Category": "Other",
+	"CreatedBy": "Jonas Reich",
+	"CreatedByURL": "https://github.com/JonasReich/OpenUnrealCodingStandard",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": false,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "OUUCodingStandard",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
 }
