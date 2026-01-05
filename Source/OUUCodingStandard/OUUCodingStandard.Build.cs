@@ -1,5 +1,4 @@
-// Copyright (c) 2022 Jonas Reich
-// [build.cs.copyright] Every Build.cs file must start with the copy right notice above
+// Copyright (c) 2025 Jonas Reich
 
 using UnrealBuildTool;
 
@@ -14,8 +13,15 @@ public class OUUCodingStandard : ModuleRules
 		bWarningsAsErrors = true;
 #endif
 
-		// [build.cs.dep] Prefer declaring dependencies as private if possible.
-		PrivateDependencyModuleNames.AddRange(
+		// [build.cs.dep] Prefer private over public dependenices.
+		// This gives a better overview of what dependencies need to be included for dependents / how clean your modules public API is.
+		// It should also improve compile/include time, but that's probably negligible.
+		// Usually you can stick to the following pattern:
+		// - Is this module included in the header? -> use a public dependency
+		// - Is this module included only in source files (implementation detail) -> use a private dependency
+		// Keep in mind: Dependency modules are implicitly transferred to dependents for the COMPILER, but not for the LINKER.
+		// -> In all cases, dependents of this module will need to re-declare a linker dependency explicitly.
+		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
 				"Core",
@@ -23,5 +29,7 @@ public class OUUCodingStandard : ModuleRules
 				"Engine"
 			}
 		);
+
+		PrivateDependencyModuleNames.Add("GameplayTags");
 	}
 }

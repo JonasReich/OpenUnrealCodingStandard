@@ -1,13 +1,6 @@
-// Copyright (c) 2022 Jonas Reich
-// [source.copyright] Every source file must start with the copy right notice above
+// Copyright (c) 2025 Jonas Reich
 
-// @STUDIO_FILE: <description>
-
-// [markup.engine.file] If this file is being added to an engine location, mark this
-// with the above comment at the start of the file. This removes the need for the
-// STUDIO engine guards around modifications in the file -> see [markup.engine]
-
-// [order.cpp] Source files should match the header order as much as possible.
+// [order.cpp_mirror_h] Source files should match the header order as much as possible.
 // Symbols that are only declared in the source files should be avoided or put into the following order:
 // - includes
 // - source declarations + inline definitions of source declarations
@@ -20,40 +13,34 @@
 // ReSharper disable CppMemberFunctionMayBeStatic
 // ReSharper disable CommentTypo
 
-// [cpp.include.header] Always include the header file corresponding to your cpp file first.
 #include "OUUCodingStandard.h"
 
+#include "GameplayTagContainer.h"
 #include "Modules/ModuleManager.h"
 #include "Net/UnrealNetwork.h"
 
-// [order.macro.impl] Implementation macros (e.g. log categories, modules) should come before any other implementations
 IMPLEMENT_MODULE(FDefaultModuleImpl, OUUCodingStandard)
 DEFINE_LOG_CATEGORY(LogOUUCodingStandard);
 
 // [cpp.namespace.private] use a namespace to wrap free functions defined only in the cpp file.
 // Default naming for such a namespace would be ModulePrefix::ModuleName::Private, but you are free to diverge.
+// If you don't reference these anywhere else you could also use an anonymous namespace if your other rules permit.
 namespace OUU::CodingStandard::Private
 {
 	// [globals] Global variables are generally not permitted. The only exception to this are console variables.
-	// But even they should be put into a namespace like here.
+	// But even they should be put into a namespace like here. Consult with your team about any exceptions to this rule.
 
-	// [order.cvar] Console variables should appear towards the top of the file, in the same groups as constants.
-	// For the most part, game code will treat them the same way, and it's easier to find the cvar declarations that
-	// way. [naming.cvar] Every console variable should start with an appropriate prefix. Use the built-in cvars as
+	// [naming.cvar] Every console variable should start with an appropriate prefix. Use the built-in cvars as
 	// reference.
 	// - r: render
 	// - s: scalability
 	// - a: animation
 	// - vt: virtual texture
 	// - ... etc
-	// The C++ variable itself should be prefixed with CVar_
 	TAutoConsoleVariable<int32> CVar_MinAwesomeness(
 		TEXT("ouu.CodingStandard.MinAwesomeness"),
 		100,
 		TEXT("Sample cvar that defines the minimum int value above 0 at which true awesomeness starts."));
-
-	// [doc.namespace] Namespaces do not need doc comments at the beginning, but ending braces should be followed by a
-	// matching comment like this (will be auto-enforced by clang-format).
 } // namespace OUU::CodingStandard::Private
 
 namespace OUU::CodingStandard::Private::IsolatedSamples
@@ -118,9 +105,6 @@ namespace OUU::CodingStandard::Private::IsolatedSamples
 	// See
 	// https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#f15-prefer-simple-and-conventional-ways-of-passing-information
 
-	// [cpp.divider] These divider lines may be used in long cpp files to give some more visual structure to the file.
-	// Using them is not mandatory, but you should stay consistent - at least within a single file.
-	//---------------------------------------------------------------------------------------------------------------------
 	void Auto()
 	{
 		// [auto] almost always auto: Prefer using auto especially in cases where...
@@ -129,7 +113,9 @@ namespace OUU::CodingStandard::Private::IsolatedSamples
 		// - spelling out the type name would be too verbose (e.g. template/iterator types)
 
 		// type is already explicit on right side of assignment
+		auto Awesomeness = EAwesomenessLevel::Awesome;
 		auto* pMeshComponent = NewObject<USkeletalMeshComponent>();
+		auto Tag = FGameplayTag::RequestGameplayTag("OUUTestTags.Foo");
 
 		// no need to know specific type of pMaterial
 		auto* pMaterial = pMeshComponent->GetMaterial(0);
@@ -238,8 +224,6 @@ namespace OUU::CodingStandard::Private::IsolatedSamples
 	{
 		// [macro] Macros should be avoided at all costs.
 		// Keep their scope as small as possible (undef as soon as possible).
-
-		// [naming.macro] Use UPPER_SNAKE_CASE for macro names.
 #define LOCAL_MACRO(x) (42 + x)
 		int32 LocalInt = LOCAL_MACRO(0);
 #undef LOCAL_MACRO
@@ -248,13 +232,13 @@ namespace OUU::CodingStandard::Private::IsolatedSamples
 
 // [namespace.func.impl] Create namespace scopes in the cpp file instead of inlining the namespace name into the
 // function signatures, e.g. here: FString OUU::CodingStandards::LexToString(EAwesomenessLevel AwesomenessLevel).
+// This is the only way that is both short and also permissible by all (relevant) compilers.
 namespace OUU::CodingStandard
 {
 	//---------------------------------------------------------------------------------------------------------------------
 	EAwesomenessLevel AwesomenessLevelFromIntValue(int32 Awesomeness)
 	{
 		// [earlyreturn] Try to use early-return where possible to reduce scope nesting.
-		// This is the only case where omitting braces is permissible, unless the return value requires a line-break
 		if (Awesomeness < 0)
 			return EAwesomenessLevel::NotAwesome;
 
@@ -269,13 +253,11 @@ namespace OUU::CodingStandard
 	//---------------------------------------------------------------------------------------------------------------------
 	FString LexToString(EAwesomenessLevel AwesomenessLevel)
 	{
-		// [switch.braces] Braces are optional around cases in switch/case blocks.
-		// When placing braces around a case block, the final break or return statement is placed inside the brace
-		// scope.
 		switch (AwesomenessLevel)
 		{
 		case EAwesomenessLevel::NotAwesome:
-			// [string.literal] String literals in production code should always use the TEXT() macro
+			// [string.literal] String literals for FString/FName should always use the TEXT() macro to ensure the
+			// correct string format is used for the current platform.
 			return TEXT("NotAwesome");
 			// not to be confused with INVTEXT() macro for FText literals!
 			// return INVTEXT("NotAwesome");
@@ -289,8 +271,6 @@ namespace OUU::CodingStandard
 	bool TryLexFromString(EAwesomenessLevel& OutAwesomenessLevel, const FString& String) { return false; }
 } // namespace OUU::CodingStandard
 
-// [cpp.divider.class] If a cpp file contains function definitions for multiple classes, place a separator
-// in the following format above the first function definition of each class
 //---------------------------------------------------------------------------------------------------------------------
 // AOUUExampleCharacter
 //---------------------------------------------------------------------------------------------------------------------
@@ -312,27 +292,6 @@ AOUUExampleCharacter::AOUUExampleCharacter(USkeletalMesh* InSkeletalMesh, EOUUEx
 	// Attach the head mesh to the character mesh = body mesh
 	HeadMeshComponent->SetupAttachment(GetMesh());
 	HeadMeshComponent->SetSkeletalMesh(InSkeletalMesh);
-}
-
-//---------------------------------------------------------------------------------------------------------------------
-EAwesomenessLevel AOUUExampleCharacter::GetAwesomenessLevel() const
-{
-	return CharacterData.GetAwesomenessLevel();
-}
-
-//---------------------------------------------------------------------------------------------------------------------
-void AOUUExampleCharacter::SetAwesomeness(int32 Awesomeness)
-{
-	const auto AwesomenessLevelBefore = CharacterData.GetAwesomenessLevel();
-
-	CharacterData = FCharacterData(Awesomeness, TEXT("set by SetAwesomeness"));
-	const auto NewAwesomenessLevel = CharacterData.GetAwesomenessLevel();
-
-	if (NewAwesomenessLevel != AwesomenessLevelBefore)
-	// [braces.one_per_line] Follow "Allman" style aka one line per brace
-	{
-		OnAwesomenessChanged.Broadcast(NewAwesomenessLevel);
-	}
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -362,8 +321,6 @@ void AOUUExampleCharacter::BeginPlay()
 	// 'Verbose' verbosity or higher.
 	UE_LOG(LogOUUCodingStandard, Verbose, TEXT("AOUUExampleCharacter::BeginPlay - %s"), *GetName());
 
-	// [naming.delegate.func] Functions that are bound to delegates are called 'Handle' + optional object hint +
-	// Delegate name without 'On' prefix, e.g. this->OnAwesomenessChanged becomes HandleOwnAwesomenessChanged
 	BoundDelegateHandle =
 		this->OnAwesomenessChanged.AddUObject(this, &AOUUExampleCharacter::HandleOwnAwesomenessChanged);
 }
@@ -399,25 +356,10 @@ bool AOUUExampleCharacter::ColorBodyPart(FName BodyPartName, EOUUExampleBodyPart
 	// [error.exceptions] Never use exceptions. Unreal does not support C++ exception handling.
 	// throw std::invalid_argument("Count case must never be used to color body parts");
 
-	// [markup.engine] If you change something in a pre-existing engine file, make sure you add the following
-	// 'STUDIO' markup comments at the start and end of your change. Old engine code may be disabled with #if 0 guard.
-
-	// STUDIO Start username: Description of the change -> Focus on the reasoning.
-#if 0
-	if (BodyPartName == HeadBodyPartName)
-	{
-		HeadColor = BodyPartColor;
-	}
-	else if (BodyPartName == TorsoBodyPartName)
-	{
-		TorsoColor = BodyPartColor;
-	}
-#endif
-	// STUDIO End
-
 	// [comment.todo] If you leave todo comments, start with #TODO, so we can find them and add a developer that should
 	// take care of the todo.
 	// #TODO username: Update mesh materials based on enum state
+	// Most code editors detect this format out of the box, so it's the one you should stick to.
 	bWasColorChanged = true;
 
 	return false;
@@ -435,8 +377,9 @@ void AOUUExampleCharacter::Multicast_SendDataToEveryone_Implementation() {}
 //---------------------------------------------------------------------------------------------------------------------
 void AOUUExampleCharacter::HandleOwnAwesomenessChanged(EAwesomenessLevel Awesomeness) const
 {
-	// [braces.always] Always use braces, even for single line if-statements.
-	// only exception: early-returns -> see [earlyreturn]
+	// [braces.always] Always use braces, even for single line if-statements. Too many hours were wasted trying to find
+	// an issue that could have been fixed by proper braces. Your specific STYLE rules might allow to leave them away
+	// for early returns, but those can be the most easily overlooked returns.
 	if (Awesomeness == EAwesomenessLevel::Awesome)
 	{
 		UE_LOG(LogOUUCodingStandard, Log, TEXT("Character %s just became AWESOME!"), *GetName());

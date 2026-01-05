@@ -1,140 +1,110 @@
-// Copyright (c) 2022 Jonas Reich
-// [header.copyright] Every header file must start with the copy right notice above
+// Copyright (c) 2025 Jonas Reich
 
-// [h.divider] These divider lines may be used in long header files, but generally their presence is a sign of breaking
-// the [basic.files] rule
-//---------------------------------------------------------------------------------------------------------------------
 // [basic.epic] Unless explicitly stated otherwise by the AUTHOR/STUDIO coding standard, follow the Epic coding standard
 // as a baseline. Especially for header files / public API. See
 // https://docs.unrealengine.com/latest/INT/Programming/Development/CodingStandard/
 
-// [basic.language] Use US English for all names and comments.
-//  BAD:    FColor SpezialisierteFarbe;
-//  BAD:    FColor SpecialisedColour;
-//  GOOD:   FColor SpecializedColor;
-
-// [basic.format] Auto-format all of your source-files using the clang-format files and application provided with the
-// project. Any rules enforced by the clang-format are omitted from this file.
+// [basic.uht] Some rules (like include order + public inheritance) are enforced by UnrealHeaderTool and are need not
+// to be explicitly stated here.
 
 // [basic.files] Types should be split into a sensible hierarchy of public/private files that is divided into plugins
 // and modules with re-usability and clear dependencies in mind.
 // Types that can be declared independently should receive independent header files.
-// NOTE: This convention breaks with this rule, to keep the reading experience contained to as few files as possible.
+// NOTE: This plugin breaks with this rule, to allow reading as much as possible in as few files as possible.
 
-// [basic.const] const is documentation as much as it is a compiler directive, so all code should strive to be
+// [basic.const] const is documentation of intent as much as it is a compiler directive, so all code should strive to be
 // const-correct. (As far as possible, note that in many places Unreal will make it very difficult to maintain
-// const-correctness. Especially an code interfacing with blueprints has many restrictions there.)
+// const-correctness. Especially code interfacing with blueprints has many restrictions there.)
 //
 // -> Passing function arguments by const pointer or reference if those arguments are not intended to be modified by the
 // function.
-// -> Flagging methods as const if they do not modify the object.
+// -> Flagging member functions as const if they do not modify the object.
 // -> Using const iteration over containers if the loop isn't intended to modify the container.
 // -> constexpr allows the compiler to evaluate certain function calls at compile-time if the parameters are also known
 // at compile-time. This can improve runtime performance, so consider using this wherever appropriate. Remember that
 // constexpr can also be used on non-const member functions!
 
-// [basic.noconst] const should be avoided in the following situations:
+// [basic.noconst] There are exceptions to the rule above:
 // - passing parameters by value -> see [func.param.types]
 // - return values -> see [func.retval.noconst]
 
-// [basic.uht] Some rules (like include order + public inheritance) are enforced by UnrealHeaderTool and are need not
-// to be explicitly stated here.
-
-// [basic.cppstandard] This project uses C++17 standard (or higher).
+// [basic.cppstandard] This project and Unreal Engine in general are using C++17 and subsets of C++20.
 // Using modern C++ language features such as [[nodiscard]] and [[fallthrough]] attributes, constexpr,
 // structured bindings, lambdas, etc. is strongly encouraged wherever applicable.
 
-// [basic.stl] Unreal provides custom versions of most types and features provided by the C++ STL. Always prefer
+// [basic.stl] Unreal provides custom versions of many types and features provided by the C++ STL. Always prefer
 // Unreal's types as it will make it easier to interface with existing Unreal code.
+// This is mainly intended to ensure cross-platform support - but sometimes also to make subtle performance tweaks.
+// This affects all areas from memory allocations to smart pointers, containers, math and geometry, file system access
+// and much more.
 
-// [basic.disable_code] Never check-in commented-out code to deactivate it.
-// Use preprocessor guards or completely remove the code instead.
-// There is only one exception: Code examples accompanied by descriptive comments (e.g. in API docs).
+// [basic.disable_code] Avoid checking in commented-out or permanently unreachable code.
+// There are two exceptions:
+// - Code examples accompanied by descriptive comments (e.g. in API docs).
+// - Removed code accompanied by a comment explaining why this code is NOT here anymore (esp. in engine code changes)
+// For these two cases commmented out code is preferrable, because it won't trip up static analyzers or IDE linters.
 
-// [basic.naming]
+// [naming.identifiers]
 // Identifier names should be short but descriptive. Avoid abbreviations, slang or anything else that might lead to
 // misunderstandings.
-//
+
+// [naming.prefixes]
 // Prefix plugins and their modules with one of the following:
 // - YOUR STUDIO PREFIXES HERE
 // - OUU for everything related to OpenUnrealUtilities plugin
-// Classes may also receive the module prefix to avoid name clashes.
+// Classes should also receive the module prefix to avoid name clashes.
+// This is particularly important for types affected by Unreal reflection (UCLASS, USTRUCT, UENUM, etc).
+// It's already cumbersome to add core-redirectors after a rename on your side but even more so if the name conflicts
+// with a type introduced by Epic in an Engine upgrade or a different third party plugin you don't even know about.
 
-// [naming.case]
-// Identifiers should all use PascalCase_WithUnderscores, with an exception for MACROS, which should be
-// ALL_CAPS_WITH_UNDERSCORES
-
-// [basic.doc] Write docs for all public API identifiers, especially types and functions. General rule:
-// - Multi line typedoc comments for all types and functions.
-// - Single line comments for fields and constants.
+// [basic.doc] Write docs for all public API identifiers, especially types and functions.
 // Exceptions can be made for self-explanatory identifier names and types declared by Unreal boilerplate macros, such as
 // log categories, module implementations, slate arguments, etc.
+// It's generally fine to assume a basic understanding of C++ and Unreal principles, but err on the side of caution and
+// overexplain intent (to make sure your implementation is not miusunderstood) and underexplain implementation details
+// (to avoid comment and implementation going out of sync).
 
 //---------------------------------------------------------------------------------------------------------------------
-// [order.h] Header files are ordered roughly like this:
-//  1. Include guard
-//  2. Includes
-//  3. Forward declarations
-//  4. Aliases
-//  5. Macro based type declarations
-//  6. Enums
-//  7. Structs
-//  8. Classes
-//  9. Functions
-// 10. Namespaces -> Start from 4. again
-
-//---------------------------------------------------------------------------------------------------------------------
-// [header.guard] Always use #pragma once before any includes
+// [header.guard] Always use #pragma once before any includes (UHT already enforces this for reflected files)
 #pragma once
 
 // [include.iwyu] Use IWYU include style for all of your headers.
 // See https://docs.unrealengine.com/latest/INT/Programming/BuildTools/UnrealBuildTool/IWYU/index.html
-// [include.quotes] Use "double quotes" for include paths instead of <angled brackets>.
-// [include.coreminimal] Always include CoreMinimal.h first in your headers.
+
 #include "CoreMinimal.h"
 
 // [include.root] Never use include paths relative to your file. This also applies to source files, but especially so to
 // header files. Instead, make the include paths relative to the Public/ or Classes/ directory of the source module.
+// This is to make sure that the include paths resolve correctly for dependent plugins.
 #include "GameFramework/Character.h"
 #include "GameFramework/Pawn.h"
 #include "Misc/EnumRange.h"
 
-// [include.generated] Include the generated header file last.
 #include "OUUCodingStandard.generated.h"
 
 //---------------------------------------------------------------------------------------------------------------------
 // [header.fwd] Use forward-declarations instead of includes wherever possible.
-// Forward declarations should always be made here instead of inline.
+// Forward declarations should always be made here instead of inline to make it easier to get an overview of "soft
+// dependencies" and reduces keyword duplication in the code below making it easier to read.
 class USkeletalMeshComponent;
 
-// [macro.decl] Macro based declarations that do not rely on types declared in the header file itself should always come
-// first after forward-declarations. Otherwise immediately after the related type.
-// (e.g. log categories, delegates)
 DECLARE_LOG_CATEGORY_EXTERN(LogOUUCodingStandard, Log, All);
 
 namespace OUU::CodingStandard
 {
-	// [naming.delegate.type] Delegate types have two permissible naming schemes:
-	// 1. FFooEvent -> Used for generic groups of events that share a common signature, e.g. FFileOperationEvent
-	// 2. FOnFoo -> Used for single purpose events, matching the delegate instance name, e.g. FOnActorDestroyed
 	DECLARE_DELEGATE(FFileOperationEvent);
 	DECLARE_DELEGATE(FOnActorDestroyed);
 } // namespace OUU::CodingStandard
 
 //---------------------------------------------------------------------------------------------------------------------
-// [doc.enum] Write type docs for enums
 /**
  * The color for body parts of colorables.
  * See IExampleColorableInterface
  */
 UENUM(BlueprintType)
 // [enum.class] Always use enum classes in favor of c-style enums
-// [naming.enum] Enum classes are prefixed with E
 enum class EOUUExampleBodyPartColor : uint8
 {
-	// [doc.enum.case] Commenting enum cases is optional. Decide on case-by-case basis.
-	// When commenting enum cases, place the comment above the case label, not behind it.
-
 	// The color associated with love, blood and anger.
 	Red,
 	// The color associated with nature and calmness.
@@ -169,8 +139,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(
 	EOUUExampleBodyPartColor,
 	NewBodyPartColor);
 
-// [naming.interface.uclass] Same as the corresponding IInterface class but with changed type prefix (U instead of I).
-// [doc.interface.uclass] The UInterface does not need a type comment, as it's mainly required for the reflection data.
 // [interface.cpponly] Mark interfaces as CannotImplementInterfaceInBlueprint if possible.
 // This makes it possible to use regular casts and invoke functions directly instead of relying on Execute_ functions.
 UINTERFACE(meta = (CannotImplementInterfaceInBlueprint))
@@ -179,7 +147,6 @@ class UOUUExampleColorableInterface : public UInterface
 	GENERATED_BODY()
 };
 
-// [doc.interface] The IInterface should receive the regular type-doc treatment.
 /**
  * An entity (usually an AActor) that has colorable body-parts.
  */
@@ -187,8 +154,6 @@ class IOUUExampleColorableInterface
 {
 	GENERATED_BODY()
 public:
-	// [doc.function] Function declarations should also be documented with multiline type-doc comments.
-	// Document parameters and return values with @param and @return(s) notation respectively.
 	/**
 	 * Color a body part by name.
 	 * @param		BodyPartName	Name ID of the body part to be colored.
@@ -212,24 +177,23 @@ enum class EAwesomenessLevel
 
 // [namespace] Reflected types (uclass, ustruct, uenum, etc) cannot be put into namespaces.
 // Everything else should be put into namespaces, especially free functions that could otherwise result in name clashes.
-// Use the following namespace structure: OUU::ModuleName or OUU::ModuleName::Private
+
 namespace OUU::CodingStandard
 {
-	EAwesomenessLevel AwesomenessLevelFromIntValue(int32 Awesomeness);
+	// [function.export] Add DLL export macros (here: OUUCODINGSTANDARD_API) to all functions declared in headers that
+	// need dynamic linkage. Only exception: If you add a function inside a "Private"/"Implementation only" namespace to
+	// clearly mark that it's not expected to be called by external dependents.
+	OUUCODINGSTANDARD_API EAwesomenessLevel AwesomenessLevelFromIntValue(int32 Awesomeness);
 
 	// [string.conv] Overload the LexToString/TryLexFromString for custom primitive string conversion instead of
 	// coming up with own names.
-	// [naming.func.param.in] Optionally prefix function input parameters with 'In' to distinguish them from locals and
-	// members.
-	FString LexToString(EAwesomenessLevel InAwesomenessLevel);
+	OUUCODINGSTANDARD_API FString LexToString(EAwesomenessLevel InAwesomenessLevel);
 
-	// [naming.func.param.out] Always prefix out-by-ref-parameters with 'Out'.
-	bool TryLexFromString(EAwesomenessLevel& OutAwesomenessLevel, const FString& String);
+	OUUCODINGSTANDARD_API bool TryLexFromString(EAwesomenessLevel& OutAwesomenessLevel, const FString& String);
 
 	/**
 	 * Track how awesome a character is.
 	 */
-	// [naming.struct] Structs are prefixed with F
 	struct FNumericAwesomeness
 	{
 	public:
@@ -253,14 +217,12 @@ namespace OUU::CodingStandard
 		// as it provides the most flexibility with operands order and usage.
 		// If it needs to access private members, make it 'friend'.
 		// NOTE: Add working functionality only for '==' and '<' everything else can be inferred from them
+		// This does NOT work with member operators (in C++17).
 		friend bool operator==(const FNumericAwesomeness& LHS, const FNumericAwesomeness& RHS);
 		friend bool operator<(const FNumericAwesomeness& LHS, const FNumericAwesomeness& RHS);
 
 		// Why the character is so awesome
 		FString AwesomenessReason = TEXT("");
-
-		// [struct.functions] Structs may only have constructor, operator and conversion functions.
-		// If it gets any more complicated than that, you should declare them as class instead.
 
 		// Get this character's numeric awesomeness converted to a fixed-step level.
 		EAwesomenessLevel GetAwesomenessLevel() const;
@@ -270,9 +232,8 @@ namespace OUU::CodingStandard
 		int32 Awesomeness = 0;
 	};
 
-	// [member.inline] Declare inlined functions immediately after the owning type declaration, not within.
-	// [order.members.function] Use the same order for function definitions as for the declarations.
-	// This also applies to definitions in the cpp file.
+	// [order.inline_funcs] Declare inlined functions with a non-empty body immediately after the owning type
+	// declaration, not within. Use the same order for function definitions as for the declarations.
 	inline EAwesomenessLevel FNumericAwesomeness::GetAwesomenessLevel() const
 	{
 		return AwesomenessLevelFromIntValue(Awesomeness);
@@ -287,9 +248,6 @@ namespace OUU::CodingStandard
 	{
 		return LHS.Awesomeness < RHS.Awesomeness;
 	}
-
-	// [namespace.end] Add a namespace end comment. This is automatically done by clang-format, but it fails to update
-	// renames, so you should keep an open eye.
 } // namespace OUU::CodingStandard
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -298,16 +256,10 @@ namespace OUU::CodingStandard
 // fully-qualified namespace name at a glance.
 namespace OUU::CodingStandard::Templates
 {
-	// [naming.template.type] Template types should always be prefixed with T
-	// [naming.template.param] All template parameters should be prefixed with 'In' and exposed to users via using
-	// declaration
-	// [naming.template.paramtype] Parameter types should be suffixed with 'Type' or 'Types' in case of a parameter pack
-	// [template.paramtype] Parameter types should always use 'typename' instead of 'class'
 	template <typename InElementType, typename InAllocatorType, int32 InDefaultSlack>
 	struct TMyContainer
 	{
 	public:
-		// [naming.template.alias] No type prefix needed for the aliases.
 		using ElementType = InElementType;
 		using AllocatorType = InAllocatorType;
 		static constexpr int32 DefaultSlack = InDefaultSlack;
@@ -324,63 +276,17 @@ namespace OUU::CodingStandard::Templates
  */
 UCLASS()
 // [class.export] Add DLL export macros (here: OUUCODINGSTANDARD_API) to all types declared in headers that need
-// dynamic linkage.
-// [naming.class] Class names should be prefixed with Unreal prefix, then optionally the module prefix (OUU or project
-// prefix -> see [naming.modules]).
-// The unreal prefix depends on the type:
-// - T: Template classes and structs T.
-// - C: Concept traits -> see Template/Models.h
-// - U: Classes that inherit from UObject
-// - A: Classes that inherit from AActor
-// - S: Classes that inherit from SWidget
-// - I: Interface classes -> see [naming.iinterface]
-// - F: All other classes -> same as structs -> see [naming.struct]
+// dynamic linkage. It's generally a bad habit to declare public functions that are then not usable because they are not
+// DLL exported.
 class OUUCODINGSTANDARD_API AOUUExampleCharacter : public ACharacter, public IOUUExampleColorableInterface
 {
-	// [order.members] Within any class/struct, members must be sorted by the following criteria in order:
-	// 1. Access Level -> see [order.access]
-	// 2. Nested categories (see items below)
-	//
-	// Categories are defined as follows:
-	// 1. Generated body macros -> see [macro.genbody]
-	// 2. Types, aliases and constants
-	//     2.1 Enums
-	//     2.2 Structs
-	//     2.3 Classes
-	//     2.4 Aliases
-	//     2.5 Constants
-	// 3. Constructors, destructors
-	//     3.1 Default constructor
-	//     3.2 Custom constructor
-	//     3.3 Copy/move constructors
-	//     3.4 Destructor
-	// 4. Member functions
-	//     4.1 Non-static, non-overridden, non-operator member functions
-	//     4.2 Operators
-	//     4.3 Static functions
-	// 5. Interface functions / Overriden virtual functions
-	//    Each base class counts as its own category (here: UObject, AActor, APawn, ACharacter,
-	//    IExampleColorableInterface) -> see [class.overrides]
-	// 6. Fields
-	//     6.1 Constant fields
-	//     6.2 Non-constant fields
-
 	// [macro.genbody] Use GENERATED_BODY() instead of the deprecated GENERATED_UCLASS_BODY(),
 	// GENERATED_IINTERFACE_BODY(), etc.
 	GENERATED_BODY()
 
-	// [order.access] Order and group members by access level: public > protected > private.
-	// In total a class should therefore have max three access level specifiers.
-	// Always add an initial access level declaration after GENERATED_BODY().
-	// Do not rely on implicit access (i.e. struct = public, class = private).
 public:
 	// [alias.using] Use using declarations for aliasing instead of typedefs
-	// [naming.alias] Adopt the prefix of the aliased type, except for the following exceptions:
-	// - template type arguments -> see [naming.template.alias]
-	// - concrete template instantiations -> see [naming.alias.template.instance]
 	using FCharacterData = OUU::CodingStandard::FNumericAwesomeness;
-
-	// [naming.alias.template.instance] When aliasing a template instance, use F as prefix, e.g.
 	using FCharacterMeshPtr = TWeakObjectPtr<USkeletalMeshComponent>;
 
 	DECLARE_EVENT_OneParam(AOUUExampleCharacter, FOnAwesomenessChanged, EAwesomenessLevel);
@@ -401,40 +307,29 @@ public:
 
 	AOUUExampleCharacter(USkeletalMesh* InSkeletalMesh, EOUUExampleBodyPartColor InHeadColor);
 
-	// [doc.delegate.instance] Do not duplicate parameter docs for delegate at the instance.
-	// Instad, focus on the things that changes between instances.
-
-	// This is called for any body part that is re-colored.
-	// This delegate is called before the more specific OnXYColorChanged events below.
-
-	// [naming.delegate.instance] Delegate instances are prefixed with 'On'. The name must be an event in past tense.
 	UPROPERTY(BlueprintAssignable)
 	FOnExampleColorablePartColorChanged OnBodyPartColorChanged;
 
-	// [doc.omit] Omit doc comments that are obvious from the type/member naming.
-	// Restating the obvious just wastes space and time.
 	UPROPERTY(BlueprintAssignable)
 	FOnExampleColorablePartColorChanged OnHeadColorChanged;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnExampleColorablePartColorChanged OnTorsoColorChanged;
 
-	// [member.accessor] Prefer declaring accessor functions (getters + setters) over making member field public.
-	EAwesomenessLevel GetAwesomenessLevel() const;
-	void SetAwesomeness(int32 Awesomeness);
-
 	// Checks if all possible colors are assigned to this character in any body part
 	bool HasAllColorsPossible() const;
 
-	// [member.order.overrides] Overridden functions are grouped by the class where the function was first declared.
+	// [order.overrides] Overridden functions are grouped by the class where the function was first declared.
 	// Each group must start with a comment indicating the originating parent class.
 	// That is the parent class where the function was first declared.
 
-	// [member.virtual] Overriden virtual functions must be marked as either override or final.
-	// Do NOT use the virtual keyword.
+	// [member.virtual.overrides] Overriden virtual functions must be marked as either override or final.
+	// Do NOT use the virtual keyword. Using virtual for an override declaration technically works but is a tripmine for
+	// later changes: If the function of the base class is changed to not be virtual anymore you expect to get a compile
+	// error, but instead the function is now a silent "new" virtual function.
 
 	// [doc.member.virtual] Virtual overrides should not need to be documented as the API should be consistent with
-	// the initial declaration.
+	// the initial declaration. Anything else is a breach of contract and MUST be commented.
 
 	// -- AActor interface
 	void BeginPlay() override;
@@ -466,18 +361,17 @@ private:
 		// ...
 	};
 
-	// [member.init] Initialize member via assignment, unless it's a default constructible struct
-	UPROPERTY(VisibleAnywhere)
-	EOUUExampleBodyPartColor HeadColor;
-
 	// [member.init] Initialize member via assignment, unless it's a default constructible struct or initialized from a
-	// constructor parameter.
+	// constructor parameter. The editor also checks for this during startup.
+	// Since this is the prevelant style in Unreal and default values (esp. if they are "invalid" defaults like
+	// INDEX_NONE, they can be considered part of the API) so I would discourage the constructor initializer list for
+	// default values.
+	UPROPERTY(VisibleAnywhere)
+	EOUUExampleBodyPartColor HeadColor = EOUUExampleBodyPartColor::Red;
+
 	UPROPERTY(VisibleAnywhere)
 	EOUUExampleBodyPartColor TorsoColor = EOUUExampleBodyPartColor::Red;
 
-	// [naming.bool] Boolean variables and member fields are prefixed with b as in the Epic conventions.
-	// Use verb as name with prefixes such as is, has, can or similar.
-	// Should be in positive form to avoid double negatives or even triple negatives.
 	bool bWasColorChanged = false;
 
 	FCharacterData CharacterData;
@@ -502,7 +396,8 @@ class UOUUExampleBlueprintFunctionLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 public:
 	// [doc.bp_func_lib] Always add a category for blueprint function library functions, so they are grouped properly in
-	// the Blueprint editor. Use Plugin|Class nesting.
+	// the Blueprint editor. Use Plugin|Class nesting. (This is now enforced by Epic for engine code and marketplace
+	// plugins)
 	UFUNCTION(BlueprintPure, Category = "OUUCodingStandard|Awesomeness")
 	static int32 GetAwesomenessThreshold();
 };
