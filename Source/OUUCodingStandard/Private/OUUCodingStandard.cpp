@@ -8,6 +8,7 @@
 
 // [resharper.disables] These disables hide some of the ReSharper static code inspections in this file.
 // They are not a good example for responsible coding.
+// ReSharper disable CppClassNeverUsed
 // ReSharper disable CppDeclaratorNeverUsed
 // ReSharper disable CppLambdaCaptureNeverUsed
 // ReSharper disable CppMemberFunctionMayBeStatic
