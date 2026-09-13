@@ -405,6 +405,7 @@ void AOUUExampleCharacter::OnRep_Score(int32 ReplicatedScore) {}
 // The output parameter OutLifetimeProps must not be renamed, otherwise the DOREPLIFETIME macros do not work.
 void AOUUExampleCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AOUUExampleCharacter, Score);
 }
 
