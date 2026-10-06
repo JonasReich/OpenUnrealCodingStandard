@@ -1,6 +1,8 @@
-# Open Unreal Coding Standard
+# Open Unreal Utilities - C++ Coding Standard
 
-![Open Unreal Coding Standard logo](./Resources/oucpp_wide.png)
+![Open Unreal Utilities - C++ Coding Standard logo](./Resources/ouu_wide.png)
+
+> Part of [Open Unreal Utilities](https://github.com/JonasReich/OpenUnrealUtilities), a family of Unreal Engine plugins and tools.
 
 ## Intent
 The coding standard reflects my personal views and what I try to enforce for personal and commercial projects I work on.
